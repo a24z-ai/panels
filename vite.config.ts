@@ -19,11 +19,19 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'esm' : 'umd'}.js`,
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react-resizable-panels'],
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime',
+        'react-resizable-panels'
+      ],
       output: {
         globals: {
-          react: 'React',
+          'react': 'React',
           'react-dom': 'ReactDOM',
+          'react/jsx-runtime': 'react/jsx-runtime',
+          'react/jsx-dev-runtime': 'react/jsx-dev-runtime',
           'react-resizable-panels': 'ReactResizablePanels',
         },
       },
