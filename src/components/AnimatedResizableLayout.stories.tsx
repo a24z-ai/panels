@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React, { useState } from 'react';
 
-import { AnimatedResizableLayout } from './AnimatedResizableLayout';
+import { AnimatedResizableLayout, type AnimatedResizableLayoutProps } from './AnimatedResizableLayout';
 
 const meta = {
   title: 'Layout/AnimatedResizableLayout',
@@ -137,11 +137,10 @@ export const Default: Story = {
   ],
 };
 
-export const WithControls: Story = {
-  render: args => {
-    const [collapsed, setCollapsed] = useState(false);
-    const [eventLog, setEventLog] = useState<string[]>([]);
-    const [dragStatus, setDragStatus] = useState('Not dragging');
+const WithControlsComponent = (args: AnimatedResizableLayoutProps) => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [eventLog, setEventLog] = useState<string[]>([]);
+  const [dragStatus, setDragStatus] = useState('Not dragging');
 
     const addLog = (message: string) => {
       setEventLog(prev => [...prev.slice(-9), `${new Date().toLocaleTimeString()}: ${message}`]);
@@ -269,7 +268,10 @@ export const WithControls: Story = {
         </div>
       </div>
     );
-  },
+};
+
+export const WithControls: Story = {
+  render: WithControlsComponent,
   args: {
     leftPanel: <div />, // Will be provided by render function
     rightPanel: <div />, // Will be provided by render function

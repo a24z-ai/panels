@@ -2,11 +2,13 @@
   width: 100%;
   height: 100%;
   position: relative;
+  background-color: var(--panel-background);
 }
 
 .hybrid-panel {
   overflow: auto;
   height: 100%;
+  background-color: var(--panel-background);
 }
 
 .hybrid-panel.animating {
@@ -21,7 +23,7 @@
 
 .resize-handle {
   width: 8px;
-  background-color: #f0f0f0;
+  background-color: var(--panel-handle);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,7 +38,11 @@
 }
 
 .resize-handle:hover {
-  background-color: #e0e0e0;
+  background-color: var(--panel-handle-hover);
+}
+
+.resize-handle:active {
+  background-color: var(--panel-handle-active);
 }
 
 .handle-bar {
@@ -50,11 +56,11 @@
 
 .collapse-toggle {
   position: absolute;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ddd;
+  background: var(--panel-button-bg);
+  border: 1px solid var(--panel-button-border);
   padding: 4px 8px;
   cursor: pointer;
-  color: #666;
+  color: var(--panel-button-icon);
   font-size: 14px;
   outline: none;
   display: flex;
@@ -67,14 +73,12 @@
 }
 
 .collapse-toggle:hover:not(:disabled) {
-  background-color: rgba(240, 240, 240, 1);
-  color: #333;
+  background-color: var(--panel-button-hover);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  transform: scale(1.05);
 }
 
 .collapse-toggle:active:not(:disabled) {
-  transform: scale(0.95);
+  opacity: 0.8;
 }
 
 .collapse-toggle:disabled {
@@ -82,24 +86,4 @@
   cursor: not-allowed;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .resize-handle {
-    background-color: #333;
-  }
-
-  .resize-handle:hover {
-    background-color: #444;
-  }
-
-  .collapse-toggle {
-    background-color: rgba(50, 50, 50, 0.9);
-    color: #ccc;
-    border-color: #555;
-  }
-
-  .collapse-toggle:hover:not(:disabled) {
-    background-color: rgba(70, 70, 70, 1);
-    color: #fff;
-  }
-}
+/* Note: Dark mode is now handled via the theme prop */
