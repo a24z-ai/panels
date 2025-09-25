@@ -47,30 +47,48 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  transition: background-color 0.2s ease, width 0.3s ease;
-  width: 11px;
+  width: 1px !important;
   cursor: col-resize;
+  background: var(--panel-border);
+  overflow: visible !important;
 }
 
+/* Invisible expanded hit area */
 .resize-handle::before {
   content: '';
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1px;
-  background: var(--panel-border);
-  transition: background-color 0.2s ease;
+  left: -10px;
+  right: -10px;
+  background: transparent;
+}
+
+/* Hover background that appears behind the line */
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -10px;
+  right: -10px;
+  background: var(--panel-handle);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: -1;
+}
+
+.resize-handle:hover::after {
+  opacity: 1;
 }
 
 .resize-handle:hover {
-  background: var(--panel-handle);
+  background: var(--panel-handle-hover);
 }
 
-.resize-handle:hover::before {
-  background: var(--panel-handle-hover);
+.resize-handle:active::after {
+  opacity: 1;
+  background: var(--panel-handle-active);
 }
 
 .resize-handle:active {
@@ -84,11 +102,11 @@
 }
 
 .resize-handle.left-handle.collapsed {
-  margin-right: -11px;
+  margin-right: -1px;
 }
 
 .resize-handle.right-handle.collapsed {
-  margin-left: -11px;
+  margin-left: -1px;
 }
 
 /* Handle Bar with Collapse Button */
@@ -138,8 +156,15 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .resize-handle {
-    width: 16px;
+  /* Larger hit area on mobile for easier touch interaction */
+  .resize-handle::before {
+    left: -8px;
+    right: -8px;
+  }
+
+  .resize-handle::after {
+    left: -8px;
+    right: -8px;
   }
 
   .collapse-toggle {
