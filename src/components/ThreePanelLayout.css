@@ -38,7 +38,6 @@
 .panel-content-wrapper {
   flex: 1;
   overflow: auto;
-  padding: 16px;
   will-change: opacity;
 }
 
@@ -149,7 +148,4 @@
     font-size: 14px;
   }
 
-  .panel-content-wrapper {
-    padding: 12px;
-  }
 }
