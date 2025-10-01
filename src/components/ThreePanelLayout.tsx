@@ -4,6 +4,7 @@ import {
   PanelGroup,
   PanelResizeHandle,
   ImperativePanelHandle,
+  ImperativePanelGroupHandle,
 } from 'react-resizable-panels';
 import { PanelTheme, defaultLightTheme } from '../types/theme';
 import './ThreePanelLayout.css';
@@ -119,6 +120,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   const [rightSize, setRightSize] = useState(collapsed.right ? 0 : defaultSizes.right);
 
   // Panel refs
+  const panelGroupRef = useRef<ImperativePanelGroupHandle>(null);
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
 
@@ -129,17 +131,16 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   const rightStartTimeRef = useRef<number | undefined>(undefined);
 
   // Generic animation function
-  type LockedPanel = [React.RefObject<ImperativePanelHandle>, number];
-
   const animatePanel = useCallback(
     (
       panelRef: React.RefObject<ImperativePanelHandle>,
+      panelIndex: 0 | 1 | 2,
       fromSize: number,
       toSize: number,
       animationFrameRef: React.MutableRefObject<number | undefined>,
       startTimeRef: React.MutableRefObject<number | undefined>,
       onComplete?: () => void,
-      lockedPanels: LockedPanel[] = []
+      lockedPanel?: { index: 0 | 1 | 2; size: number }
     ) => {
       if (!panelRef.current) return;
 
@@ -148,6 +149,48 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
       }
 
       startTimeRef.current = performance.now();
+
+      const resolvedInitialLayout = (() => {
+        const layout = panelGroupRef.current?.getLayout();
+        if (layout && layout.length === 3) {
+          return layout as [number, number, number];
+        }
+        const fallbackLeft = panelIndex === 0 ? fromSize : leftSize;
+        const fallbackRight = panelIndex === 2 ? fromSize : rightSize;
+        const fallbackMiddle = Math.max(100 - fallbackLeft - fallbackRight, 0);
+        return [fallbackLeft, fallbackMiddle, fallbackRight];
+      })();
+
+      const totalSize = resolvedInitialLayout.reduce((sum, size) => sum + size, 0);
+
+      const applyLayout = (targetSize: number) => {
+        if (!panelGroupRef.current) {
+          panelRef.current?.resize(targetSize);
+          return;
+        }
+
+        let [left, middle, right] = resolvedInitialLayout;
+
+        if (lockedPanel) {
+          if (lockedPanel.index === 0) left = lockedPanel.size;
+          if (lockedPanel.index === 2) right = lockedPanel.size;
+          if (lockedPanel.index === 1) middle = lockedPanel.size;
+        }
+
+        if (panelIndex === 0) {
+          left = targetSize;
+        } else if (panelIndex === 1) {
+          middle = targetSize;
+        } else if (panelIndex === 2) {
+          right = targetSize;
+        }
+
+        if (panelIndex !== 1) {
+          middle = Math.max(totalSize - left - right, 0);
+        }
+
+        panelGroupRef.current.setLayout([left, middle, right]);
+      };
 
       const animate = (currentTime: number) => {
         if (!startTimeRef.current || !panelRef.current) return;
@@ -163,37 +206,25 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
         const newSize = fromSize + (toSize - fromSize) * eased;
 
-        // Always use resize during animation
-        panelRef.current.resize(newSize);
-
-        lockedPanels.forEach(([lockedRef, lockedSize]) => {
-          if (lockedRef.current) {
-            lockedRef.current.resize(lockedSize);
-          }
-        });
+        applyLayout(newSize);
 
         if (progress < 1) {
           animationFrameRef.current = requestAnimationFrame(animate);
         } else {
           // Ensure final state
+          applyLayout(toSize);
           if (toSize === 0) {
             panelRef.current.collapse();
           } else {
             panelRef.current.resize(toSize);
           }
-
-          lockedPanels.forEach(([lockedRef, lockedSize]) => {
-            if (lockedRef.current) {
-              lockedRef.current.resize(lockedSize);
-            }
-          });
           if (onComplete) onComplete();
         }
       };
 
       animationFrameRef.current = requestAnimationFrame(animate);
     },
-    [animationDuration]
+    [animationDuration, leftSize, rightSize]
   );
 
   // Left panel collapse/expand handlers
@@ -206,6 +237,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
     animatePanel(
       leftPanelRef,
+      0,
       leftSize,
       0,
       leftAnimationFrameRef,
@@ -219,8 +251,8 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
         if (onLeftCollapseComplete) onLeftCollapseComplete();
       },
       !rightCollapsed && rightSize > 0
-        ? [[rightPanelRef, rightSize]]
-        : []
+        ? { index: 2, size: rightSize }
+        : undefined
     );
   }, [
     leftAnimating,
@@ -244,6 +276,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
     animatePanel(
       leftPanelRef,
       0,
+      0,
       defaultSizes.left,
       leftAnimationFrameRef,
       leftStartTimeRef,
@@ -256,8 +289,8 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
         if (onLeftExpandComplete) onLeftExpandComplete();
       },
       !rightCollapsed && rightSize > 0
-        ? [[rightPanelRef, rightSize]]
-        : []
+        ? { index: 2, size: rightSize }
+        : undefined
     );
   }, [
     leftAnimating,
@@ -281,6 +314,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
     animatePanel(
       rightPanelRef,
+      2,
       rightSize,
       0,
       rightAnimationFrameRef,
@@ -294,8 +328,8 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
         if (onRightCollapseComplete) onRightCollapseComplete();
       },
       !leftCollapsed && leftSize > 0
-        ? [[leftPanelRef, leftSize]]
-        : []
+        ? { index: 0, size: leftSize }
+        : undefined
     );
   }, [
     rightAnimating,
@@ -318,6 +352,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
     animatePanel(
       rightPanelRef,
+      2,
       0,
       defaultSizes.right,
       rightAnimationFrameRef,
@@ -331,8 +366,8 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
         if (onRightExpandComplete) onRightExpandComplete();
       },
       !leftCollapsed && leftSize > 0
-        ? [[leftPanelRef, leftSize]]
-        : []
+        ? { index: 0, size: leftSize }
+        : undefined
     );
   }, [
     rightAnimating,
@@ -480,7 +515,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
   return (
     <div className={`three-panel-layout ${className}`} style={{ ...themeStyles, ...style }}>
-      <PanelGroup direction="horizontal" onLayout={handleDragEnd}>
+      <PanelGroup ref={panelGroupRef} direction="horizontal" onLayout={handleDragEnd}>
         {/* Left Panel */}
         <Panel
           ref={leftPanelRef}
