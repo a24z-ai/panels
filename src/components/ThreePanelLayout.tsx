@@ -513,6 +513,9 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
     '--panel-button-icon': theme?.buttonIcon || defaultLightTheme.buttonIcon,
   } as React.CSSProperties;
 
+  const leftPanelMinSize = leftAnimating || rightAnimating ? 0 : minSizes.left;
+  const rightPanelMinSize = leftAnimating || rightAnimating ? 0 : minSizes.right;
+
   return (
     <div className={`three-panel-layout ${className}`} style={{ ...themeStyles, ...style }}>
       <PanelGroup ref={panelGroupRef} direction="horizontal" onLayout={handleDragEnd}>
@@ -521,7 +524,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
           ref={leftPanelRef}
           collapsible={collapsiblePanels.left}
           defaultSize={collapsed.left ? 0 : defaultSizes.left}
-          minSize={minSizes.left}
+          minSize={leftPanelMinSize}
           collapsedSize={0}
           onResize={handleLeftResize}
           onCollapse={() => setLeftCollapsed(true)}
@@ -598,7 +601,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
           ref={rightPanelRef}
           collapsible={collapsiblePanels.right}
           defaultSize={collapsed.right ? 0 : defaultSizes.right}
-          minSize={minSizes.right}
+          minSize={rightPanelMinSize}
           collapsedSize={0}
           onResize={handleRightResize}
           onCollapse={() => setRightCollapsed(true)}
