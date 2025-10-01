@@ -1,6 +1,6 @@
 {
   "name": "@a24z/panels",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A modern React panel layout component library built on top of react-resizable-panels",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -23,8 +23,8 @@
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./dist/style.css": "./dist/style.css",
-    "./style.css": "./dist/style.css"
+    "./dist/panels.css": "./dist/panels.css",
+    "./panels.css": "./dist/panels.css"
   },
   "files": [
     "dist"
