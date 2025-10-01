@@ -110,6 +110,9 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   const [rightAnimating, setRightAnimating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
+  const leftFullyCollapsed = leftCollapsed && !leftAnimating;
+  const rightFullyCollapsed = rightCollapsed && !rightAnimating;
+
 
   // State for current sizes
   const [leftSize, setLeftSize] = useState(collapsed.left ? 0 : defaultSizes.left);
@@ -361,11 +364,11 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
     if (panelName === 'left' && collapsiblePanels.left) {
       className += ' collapsible-panel';
       if (leftAnimating && !isDragging) className += ' animating';
-      if (leftCollapsed) className += ' collapsed';
+      if (leftFullyCollapsed) className += ' collapsed';
     } else if (panelName === 'right' && collapsiblePanels.right) {
       className += ' collapsible-panel';
       if (rightAnimating && !isDragging) className += ' animating';
-      if (rightCollapsed) className += ' collapsed';
+      if (rightFullyCollapsed) className += ' collapsed';
     } else if (panelName === 'middle') {
       className += ' middle-panel';
     }
@@ -427,9 +430,9 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
         {/* Left Resize Handle */}
         <PanelResizeHandle
-          className={`resize-handle left-handle ${leftCollapsed ? 'collapsed' : ''}`}
+          className={`resize-handle left-handle ${leftFullyCollapsed ? 'collapsed' : ''}`}
           onDragging={handleDragging}
-          disabled={leftCollapsed}
+          disabled={leftFullyCollapsed}
         >
           {showCollapseButtons && collapsiblePanels.left && (
             <div className="handle-bar">
@@ -458,9 +461,9 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
         {/* Right Resize Handle */}
         <PanelResizeHandle
-          className={`resize-handle right-handle ${rightCollapsed ? 'collapsed' : ''}`}
+          className={`resize-handle right-handle ${rightFullyCollapsed ? 'collapsed' : ''}`}
           onDragging={handleDragging}
-          disabled={rightCollapsed}
+          disabled={rightFullyCollapsed}
         >
           {showCollapseButtons && collapsiblePanels.right && (
             <div className="handle-bar">
