@@ -202,3 +202,33 @@ export const WithCallbacks: Story = {
     onPanelResize: (sizes) => console.log('Panel sizes:', sizes),
   },
 };
+
+export const ControlledByExternalButtons: Story = {
+  render: () => {
+    const [leftCollapsed, setLeftCollapsed] = React.useState(false);
+    const [rightCollapsed, setRightCollapsed] = React.useState(false);
+
+    return (
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '10px', borderBottom: '1px solid #ccc', background: '#f7f7f7' }}>
+          <h4>External Controls</h4>
+          <button onClick={() => setLeftCollapsed(!leftCollapsed)} style={{ marginRight: '10px' }}>
+            Toggle Left Panel
+          </button>
+          <button onClick={() => setRightCollapsed(!rightCollapsed)}>
+            Toggle Right Panel
+          </button>
+        </div>
+        <div style={{ flex: 1 }}>
+          <ThreePanelLayout
+            leftPanel={<LeftContent />}
+            middlePanel={<MiddleContent />}
+            rightPanel={<RightContent />}
+            collapsed={{ left: leftCollapsed, right: rightCollapsed }}
+            showCollapseButtons={true}
+          />
+        </div>
+      </div>
+    );
+  },
+};
