@@ -1,4 +1,5 @@
 import React, { ReactNode, useState, useRef, useEffect, useCallback } from 'react';
+import { flushSync } from 'react-dom';
 import {
   Panel,
   PanelGroup,
@@ -231,8 +232,10 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   const handleLeftCollapse = useCallback(() => {
     if (leftAnimating || isDragging || !collapsiblePanels.left) return;
 
-    setLeftAnimating(true);
-    setLeftCollapsed(true);
+    flushSync(() => {
+      setLeftAnimating(true);
+      setLeftCollapsed(true);
+    });
     if (onLeftCollapseStart) onLeftCollapseStart();
 
     animatePanel(
@@ -269,8 +272,10 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   const handleLeftExpand = useCallback(() => {
     if (leftAnimating || isDragging || !collapsiblePanels.left) return;
 
-    setLeftAnimating(true);
-    setLeftCollapsed(false);
+    flushSync(() => {
+      setLeftAnimating(true);
+      setLeftCollapsed(false);
+    });
     if (onLeftExpandStart) onLeftExpandStart();
 
     animatePanel(
@@ -308,8 +313,10 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   const handleRightCollapse = useCallback(() => {
     if (rightAnimating || isDragging || !collapsiblePanels.right) return;
 
-    setRightAnimating(true);
-    setRightCollapsed(true);
+    flushSync(() => {
+      setRightAnimating(true);
+      setRightCollapsed(true);
+    });
     if (onRightCollapseStart) onRightCollapseStart();
 
     animatePanel(
@@ -346,8 +353,10 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   const handleRightExpand = useCallback(() => {
     if (rightAnimating || isDragging || !collapsiblePanels.right) return;
 
-    setRightAnimating(true);
-    setRightCollapsed(false);
+    flushSync(() => {
+      setRightAnimating(true);
+      setRightCollapsed(false);
+    });
     if (onRightExpandStart) onRightExpandStart();
 
     animatePanel(
