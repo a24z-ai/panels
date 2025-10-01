@@ -308,12 +308,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   }, [rightAnimating]);
 
   // Drag handlers
-  const handleDragStart = useCallback(() => {
-    setIsDragging(true);
-  }, []);
-
   const handleDragEnd = useCallback(() => {
-    setIsDragging(false);
     if (onPanelResize) {
       onPanelResize({
         left: leftSize,
@@ -322,6 +317,16 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
       });
     }
   }, [leftSize, rightSize, onPanelResize]);
+
+  const handleDragging = useCallback(
+    (dragging: boolean) => {
+      setIsDragging(dragging);
+      if (!dragging) {
+        handleDragEnd();
+      }
+    },
+    [handleDragEnd]
+  );
 
   // Effect for external collapsed prop changes
   useEffect(() => {
@@ -429,7 +434,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
         {/* Left Resize Handle */}
         <PanelResizeHandle
           className={`resize-handle left-handle ${hideLeftHandle ? 'collapsed' : ''}`}
-          onDragging={handleDragStart}
+          onDragging={handleDragging}
           style={hideLeftHandle ? { visibility: 'hidden', width: 0 } : undefined}
         >
           {showCollapseButtons && collapsiblePanels.left && (
@@ -460,7 +465,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
         {/* Right Resize Handle */}
         <PanelResizeHandle
           className={`resize-handle right-handle ${hideRightHandle ? 'collapsed' : ''}`}
-          onDragging={handleDragStart}
+          onDragging={handleDragging}
           style={hideRightHandle ? { visibility: 'hidden', width: 0 } : undefined}
         >
           {showCollapseButtons && collapsiblePanels.right && (
