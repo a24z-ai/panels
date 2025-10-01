@@ -110,9 +110,6 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   const [rightAnimating, setRightAnimating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  // State for handle visibility
-  const [hideLeftHandle, setHideLeftHandle] = useState(collapsed.left || false);
-  const [hideRightHandle, setHideRightHandle] = useState(collapsed.right || false);
 
   // State for current sizes
   const [leftSize, setLeftSize] = useState(collapsed.left ? 0 : defaultSizes.left);
@@ -197,7 +194,6 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
       leftStartTimeRef,
       () => {
         setLeftSize(0);
-        setHideLeftHandle(true);
         setLeftAnimating(false);
         if (onLeftCollapseComplete) onLeftCollapseComplete();
       }
@@ -209,7 +205,6 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
     setLeftAnimating(true);
     setLeftCollapsed(false);
-    setHideLeftHandle(false);
     if (onLeftExpandStart) onLeftExpandStart();
 
     animatePanel(
@@ -242,7 +237,6 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
       rightStartTimeRef,
       () => {
         setRightSize(0);
-        setHideRightHandle(true);
         setRightAnimating(false);
         if (onRightCollapseComplete) onRightCollapseComplete();
       }
@@ -254,7 +248,6 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
     setRightAnimating(true);
     setRightCollapsed(false);
-    setHideRightHandle(false);
     if (onRightExpandStart) onRightExpandStart();
 
     animatePanel(
@@ -290,22 +283,22 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
   // Resize handlers
   const handleLeftResize = useCallback((size: number) => {
-    if (!leftAnimating) {
+    if (!leftAnimating && !rightAnimating) {
       setLeftSize(size);
       if (size > 0) {
         setLeftCollapsed(false);
       }
     }
-  }, [leftAnimating]);
+  }, [leftAnimating, rightAnimating]);
 
   const handleRightResize = useCallback((size: number) => {
-    if (!rightAnimating) {
+    if (!leftAnimating && !rightAnimating) {
       setRightSize(size);
       if (size > 0) {
         setRightCollapsed(false);
       }
     }
-  }, [rightAnimating]);
+  }, [leftAnimating, rightAnimating]);
 
   // Drag handlers
   const handleDragEnd = useCallback(() => {
@@ -434,9 +427,9 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
         {/* Left Resize Handle */}
         <PanelResizeHandle
-          className={`resize-handle left-handle ${hideLeftHandle ? 'collapsed' : ''}`}
+          className={`resize-handle left-handle ${leftCollapsed ? 'collapsed' : ''}`}
           onDragging={handleDragging}
-          style={hideLeftHandle ? { visibility: 'hidden', width: 0 } : undefined}
+          disabled={leftCollapsed}
         >
           {showCollapseButtons && collapsiblePanels.left && (
             <div className="handle-bar">
@@ -465,9 +458,9 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
 
         {/* Right Resize Handle */}
         <PanelResizeHandle
-          className={`resize-handle right-handle ${hideRightHandle ? 'collapsed' : ''}`}
+          className={`resize-handle right-handle ${rightCollapsed ? 'collapsed' : ''}`}
           onDragging={handleDragging}
-          style={hideRightHandle ? { visibility: 'hidden', width: 0 } : undefined}
+          disabled={rightCollapsed}
         >
           {showCollapseButtons && collapsiblePanels.right && (
             <div className="handle-bar">
