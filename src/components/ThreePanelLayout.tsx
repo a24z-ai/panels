@@ -134,7 +134,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   // Generic animation function
   const animatePanel = useCallback(
     (
-      panelRef: React.RefObject<ImperativePanelHandle>,
+      panelRef: React.RefObject<ImperativePanelHandle | null>,
       fromSize: number,
       toSize: number,
       animationFrameRef: React.MutableRefObject<number | undefined>,
