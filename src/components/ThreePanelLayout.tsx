@@ -238,25 +238,31 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
     });
     if (onLeftCollapseStart) onLeftCollapseStart();
 
-    animatePanel(
-      leftPanelRef,
-      0,
-      leftSize,
-      0,
-      leftAnimationFrameRef,
-      leftStartTimeRef,
-      () => {
-        setLeftSize(0);
-        if (!rightCollapsed && rightPanelRef.current && rightSize > 0) {
-          rightPanelRef.current.resize(rightSize);
-        }
-        setLeftAnimating(false);
-        if (onLeftCollapseComplete) onLeftCollapseComplete();
-      },
-      !rightCollapsed && rightSize > 0
-        ? { index: 2, size: rightSize }
-        : undefined
-    );
+    if (leftAnimationFrameRef.current) {
+      cancelAnimationFrame(leftAnimationFrameRef.current);
+    }
+
+    leftAnimationFrameRef.current = requestAnimationFrame(() => {
+      animatePanel(
+        leftPanelRef,
+        0,
+        leftSize,
+        0,
+        leftAnimationFrameRef,
+        leftStartTimeRef,
+        () => {
+          setLeftSize(0);
+          if (!rightCollapsed && rightPanelRef.current && rightSize > 0) {
+            rightPanelRef.current.resize(rightSize);
+          }
+          setLeftAnimating(false);
+          if (onLeftCollapseComplete) onLeftCollapseComplete();
+        },
+        !rightCollapsed && rightSize > 0
+          ? { index: 2, size: rightSize }
+          : undefined
+      );
+    });
   }, [
     leftAnimating,
     isDragging,
@@ -278,25 +284,31 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
     });
     if (onLeftExpandStart) onLeftExpandStart();
 
-    animatePanel(
-      leftPanelRef,
-      0,
-      0,
-      defaultSizes.left,
-      leftAnimationFrameRef,
-      leftStartTimeRef,
-      () => {
-        setLeftSize(defaultSizes.left);
-        if (!rightCollapsed && rightPanelRef.current && rightSize > 0) {
-          rightPanelRef.current.resize(rightSize);
-        }
-        setLeftAnimating(false);
-        if (onLeftExpandComplete) onLeftExpandComplete();
-      },
-      !rightCollapsed && rightSize > 0
-        ? { index: 2, size: rightSize }
-        : undefined
-    );
+    if (leftAnimationFrameRef.current) {
+      cancelAnimationFrame(leftAnimationFrameRef.current);
+    }
+
+    leftAnimationFrameRef.current = requestAnimationFrame(() => {
+      animatePanel(
+        leftPanelRef,
+        0,
+        0,
+        defaultSizes.left,
+        leftAnimationFrameRef,
+        leftStartTimeRef,
+        () => {
+          setLeftSize(defaultSizes.left);
+          if (!rightCollapsed && rightPanelRef.current && rightSize > 0) {
+            rightPanelRef.current.resize(rightSize);
+          }
+          setLeftAnimating(false);
+          if (onLeftExpandComplete) onLeftExpandComplete();
+        },
+        !rightCollapsed && rightSize > 0
+          ? { index: 2, size: rightSize }
+          : undefined
+      );
+    });
   }, [
     leftAnimating,
     isDragging,
@@ -319,25 +331,31 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
     });
     if (onRightCollapseStart) onRightCollapseStart();
 
-    animatePanel(
-      rightPanelRef,
-      2,
-      rightSize,
-      0,
-      rightAnimationFrameRef,
-      rightStartTimeRef,
-      () => {
-        setRightSize(0);
-        if (!leftCollapsed && leftPanelRef.current && leftSize > 0) {
-          leftPanelRef.current.resize(leftSize);
-        }
-        setRightAnimating(false);
-        if (onRightCollapseComplete) onRightCollapseComplete();
-      },
-      !leftCollapsed && leftSize > 0
-        ? { index: 0, size: leftSize }
-        : undefined
-    );
+    if (rightAnimationFrameRef.current) {
+      cancelAnimationFrame(rightAnimationFrameRef.current);
+    }
+
+    rightAnimationFrameRef.current = requestAnimationFrame(() => {
+      animatePanel(
+        rightPanelRef,
+        2,
+        rightSize,
+        0,
+        rightAnimationFrameRef,
+        rightStartTimeRef,
+        () => {
+          setRightSize(0);
+          if (!leftCollapsed && leftPanelRef.current && leftSize > 0) {
+            leftPanelRef.current.resize(leftSize);
+          }
+          setRightAnimating(false);
+          if (onRightCollapseComplete) onRightCollapseComplete();
+        },
+        !leftCollapsed && leftSize > 0
+          ? { index: 0, size: leftSize }
+          : undefined
+      );
+    });
   }, [
     rightAnimating,
     isDragging,
@@ -359,25 +377,31 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
     });
     if (onRightExpandStart) onRightExpandStart();
 
-    animatePanel(
-      rightPanelRef,
-      2,
-      0,
-      defaultSizes.right,
-      rightAnimationFrameRef,
-      rightStartTimeRef,
-      () => {
-        setRightSize(defaultSizes.right);
-        if (!leftCollapsed && leftPanelRef.current && leftSize > 0) {
-          leftPanelRef.current.resize(leftSize);
-        }
-        setRightAnimating(false);
-        if (onRightExpandComplete) onRightExpandComplete();
-      },
-      !leftCollapsed && leftSize > 0
-        ? { index: 0, size: leftSize }
-        : undefined
-    );
+    if (rightAnimationFrameRef.current) {
+      cancelAnimationFrame(rightAnimationFrameRef.current);
+    }
+
+    rightAnimationFrameRef.current = requestAnimationFrame(() => {
+      animatePanel(
+        rightPanelRef,
+        2,
+        0,
+        defaultSizes.right,
+        rightAnimationFrameRef,
+        rightStartTimeRef,
+        () => {
+          setRightSize(defaultSizes.right);
+          if (!leftCollapsed && leftPanelRef.current && leftSize > 0) {
+            leftPanelRef.current.resize(leftSize);
+          }
+          setRightAnimating(false);
+          if (onRightExpandComplete) onRightExpandComplete();
+        },
+        !leftCollapsed && leftSize > 0
+          ? { index: 0, size: leftSize }
+          : undefined
+      );
+    });
   }, [
     rightAnimating,
     isDragging,
