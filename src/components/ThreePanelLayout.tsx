@@ -380,14 +380,15 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
     return className;
   };
 
-  const getAnimationStyle = (isAnimating: boolean) => {
-    if (isAnimating && !isDragging) {
-      return {
-        transition: `flex ${animationDuration}ms ${animationEasing}`,
-      };
-    }
-    return undefined;
-  };
+  const leftCollapsiblePanelStyle =
+    leftAnimating && !isDragging
+      ? ({ transition: `flex ${animationDuration}ms ${animationEasing}` } satisfies React.CSSProperties)
+      : undefined;
+
+  const rightCollapsiblePanelStyle =
+    rightAnimating && !isDragging
+      ? ({ transition: `flex ${animationDuration}ms ${animationEasing}` } satisfies React.CSSProperties)
+      : undefined;
 
   // Apply theme as CSS variables
   const themeStyles = {
@@ -416,7 +417,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
           onCollapse={() => setLeftCollapsed(true)}
           onExpand={() => setLeftCollapsed(false)}
           className={getPanelClassName('left')}
-          style={getAnimationStyle(leftAnimating)}
+          style={leftCollapsiblePanelStyle}
         >
           <div
             className="panel-content-wrapper"
@@ -493,7 +494,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
           onCollapse={() => setRightCollapsed(true)}
           onExpand={() => setRightCollapsed(false)}
           className={getPanelClassName('right')}
-          style={getAnimationStyle(rightAnimating)}
+          style={rightCollapsiblePanelStyle}
         >
           <div
             className="panel-content-wrapper"

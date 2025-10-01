@@ -242,6 +242,11 @@ export const AnimatedResizableLayout: React.FC<AnimatedResizableLayoutProps> = (
     '--panel-button-icon': theme?.buttonIcon || defaultLightTheme.buttonIcon,
   } as React.CSSProperties;
 
+  const collapsiblePanelStyle =
+    isAnimating && !isDragging
+      ? ({ transition: `flex ${animationDuration}ms ${animationEasing}` } satisfies React.CSSProperties)
+      : undefined;
+
   // Apply animation class when animating, not when dragging
   const getPanelClassName = (isCollapsiblePanel: boolean) => {
     let className = 'hybrid-panel';
@@ -270,13 +275,7 @@ export const AnimatedResizableLayout: React.FC<AnimatedResizableLayoutProps> = (
           onCollapse={leftIsCollapsible ? () => setIsCollapsed(true) : undefined}
           onExpand={leftIsCollapsible ? () => setIsCollapsed(false) : undefined}
           className={getPanelClassName(leftIsCollapsible)}
-          style={
-            isAnimating && !isDragging
-              ? {
-                  transition: `flex ${animationDuration}ms ${animationEasing}`,
-                }
-              : undefined
-          }
+          style={leftIsCollapsible ? collapsiblePanelStyle : undefined}
         >
           <div
             className="panel-content-wrapper"
@@ -320,13 +319,7 @@ export const AnimatedResizableLayout: React.FC<AnimatedResizableLayoutProps> = (
           onCollapse={!leftIsCollapsible ? () => setIsCollapsed(true) : undefined}
           onExpand={!leftIsCollapsible ? () => setIsCollapsed(false) : undefined}
           className={getPanelClassName(!leftIsCollapsible)}
-          style={
-            isAnimating && !isDragging
-              ? {
-                  transition: `flex ${animationDuration}ms ${animationEasing}`,
-                }
-              : undefined
-          }
+          style={!leftIsCollapsible ? collapsiblePanelStyle : undefined}
         >
           <div
             className="panel-content-wrapper"
