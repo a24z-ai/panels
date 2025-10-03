@@ -1,5 +1,7 @@
 export { AnimatedResizableLayout, type AnimatedResizableLayoutProps } from './components/AnimatedResizableLayout';
 export { ThreePanelLayout, type ThreePanelLayoutProps } from './components/ThreePanelLayout';
+export { ConfigurablePanelLayout, type ConfigurablePanelLayoutProps, type PanelDefinitionWithContent } from './components/ConfigurablePanelLayout';
+export { PanelConfigurator, type PanelConfiguratorProps, type PanelDefinition, type PanelLayout } from './components/PanelConfigurator';
 
 // Types are kept for potential future use
 export type {

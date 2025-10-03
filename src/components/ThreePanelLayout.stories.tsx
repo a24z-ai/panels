@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { ThreePanelLayout } from './ThreePanelLayout';
 import { defaultDarkTheme } from '../types/theme';
 import React from 'react';
@@ -191,15 +192,15 @@ export const WithCallbacks: Story = {
     rightPanel: <RightContent />,
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 60, right: 20 },
-    onLeftCollapseStart: () => console.log('Left panel collapse started'),
-    onLeftCollapseComplete: () => console.log('Left panel collapse completed'),
-    onLeftExpandStart: () => console.log('Left panel expand started'),
-    onLeftExpandComplete: () => console.log('Left panel expand completed'),
-    onRightCollapseStart: () => console.log('Right panel collapse started'),
-    onRightCollapseComplete: () => console.log('Right panel collapse completed'),
-    onRightExpandStart: () => console.log('Right panel expand started'),
-    onRightExpandComplete: () => console.log('Right panel expand completed'),
-    onPanelResize: (sizes) => console.log('Panel sizes:', sizes),
+    onLeftCollapseStart: fn(),
+    onLeftCollapseComplete: fn(),
+    onLeftExpandStart: fn(),
+    onLeftExpandComplete: fn(),
+    onRightCollapseStart: fn(),
+    onRightCollapseComplete: fn(),
+    onRightExpandStart: fn(),
+    onRightExpandComplete: fn(),
+    onPanelResize: fn(),
   },
 };
 

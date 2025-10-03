@@ -1,0 +1,190 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { ConfigurablePanelLayout, PanelDefinitionWithContent } from './ConfigurablePanelLayout';
+import { PanelLayout } from './PanelConfigurator';
+import { defaultDarkTheme } from '../types/theme';
+import React, { useState } from 'react';
+
+const meta = {
+  title: 'Components/ConfigurablePanelLayout',
+  component: ConfigurablePanelLayout,
+  parameters: {
+    layout: 'fullscreen',
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ height: '100vh', width: '100vw' }}>
+        <Story />
+      </div>
+    ),
+  ],
+  tags: ['autodocs'],
+} satisfies Meta<typeof ConfigurablePanelLayout>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+// Sample panel definitions with content
+const samplePanels: PanelDefinitionWithContent[] = [
+  {
+    id: 'nav',
+    label: 'Navigation',
+    content: (
+      <div style={{ padding: '20px' }}>
+        <h3>Navigation Panel</h3>
+        <ul>
+          <li>Home</li>
+          <li>About</li>
+          <li>Services</li>
+          <li>Contact</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    id: 'main',
+    label: 'Main Content',
+    content: (
+      <div style={{ padding: '20px' }}>
+        <h2>Main Content Area</h2>
+        <p>This is the main content panel.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'sidebar',
+    label: 'Sidebar',
+    content: (
+      <div style={{ padding: '20px' }}>
+        <h3>Sidebar</h3>
+        <div style={{ padding: '10px', background: '#f0f0f0', borderRadius: '4px', marginBottom: '10px' }}>
+          Widget 1
+        </div>
+        <div style={{ padding: '10px', background: '#f0f0f0', borderRadius: '4px' }}>
+          Widget 2
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: 'tools',
+    label: 'Tools',
+    content: (
+      <div style={{ padding: '20px' }}>
+        <h3>Tools Panel</h3>
+        <button style={{ margin: '5px', padding: '8px 16px' }}>Tool 1</button>
+        <button style={{ margin: '5px', padding: '8px 16px' }}>Tool 2</button>
+      </div>
+    ),
+  },
+];
+
+// Basic story
+export const Default: Story = {
+  args: {
+    panels: samplePanels,
+    layout: {
+      left: 'nav',
+      middle: 'main',
+      right: 'sidebar',
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 20, middle: 60, right: 20 },
+  },
+};
+
+// With different layout configuration
+export const DifferentLayout: Story = {
+  args: {
+    panels: samplePanels,
+    layout: {
+      left: 'tools',
+      middle: 'main',
+      right: 'nav',
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 15, middle: 70, right: 15 },
+  },
+};
+
+// With empty slots
+export const WithEmptySlots: Story = {
+  args: {
+    panels: samplePanels,
+    layout: {
+      left: 'nav',
+      middle: 'main',
+      right: null,
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 25, middle: 75, right: 0 },
+  },
+};
+
+// Interactive story with dynamic layout
+const InteractiveConfigurableLayout = () => {
+  const [layout, setLayout] = useState<PanelLayout>({
+    left: 'nav',
+    middle: 'main',
+    right: 'sidebar',
+  });
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '10px', borderBottom: '1px solid #ccc', background: '#f7f7f7' }}>
+        <h4>Change Layout Configuration</h4>
+        <select
+          value={layout.left || ''}
+          onChange={(e) => setLayout({ ...layout, left: e.target.value || null })}
+          style={{ margin: '5px', padding: '5px' }}
+        >
+          <option value="">Empty</option>
+          {samplePanels.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+        </select>
+        <select
+          value={layout.middle || ''}
+          onChange={(e) => setLayout({ ...layout, middle: e.target.value || null })}
+          style={{ margin: '5px', padding: '5px' }}
+        >
+          <option value="">Empty</option>
+          {samplePanels.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+        </select>
+        <select
+          value={layout.right || ''}
+          onChange={(e) => setLayout({ ...layout, right: e.target.value || null })}
+          style={{ margin: '5px', padding: '5px' }}
+        >
+          <option value="">Empty</option>
+          {samplePanels.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+        </select>
+      </div>
+      <div style={{ flex: 1 }}>
+        <ConfigurablePanelLayout
+          panels={samplePanels}
+          layout={layout}
+          showCollapseButtons={true}
+          defaultSizes={{ left: 20, middle: 60, right: 20 }}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const Interactive: Story = {
+  render: () => <InteractiveConfigurableLayout />,
+};
+
+// Dark theme
+export const DarkTheme: Story = {
+  args: {
+    panels: samplePanels,
+    layout: {
+      left: 'nav',
+      middle: 'main',
+      right: 'sidebar',
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 20, middle: 60, right: 20 },
+    theme: defaultDarkTheme,
+  },
+};
