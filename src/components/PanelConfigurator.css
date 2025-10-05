@@ -220,3 +220,86 @@
   font-size: 0.875rem;
   text-align: center;
 }
+
+/* Multi-select styles */
+.available-panel.multi-selected {
+  border-color: var(--panel-border-selected);
+  background: var(--panel-bg-selected);
+  box-shadow: 0 0 0 2px var(--panel-bg-selected);
+}
+
+.multi-select-badge {
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--panel-border-selected);
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 12px;
+  font-weight: normal;
+}
+
+.multi-select-hint {
+  background: var(--panel-bg-selected);
+  border-color: var(--panel-border-selected);
+}
+
+/* Tab group styles */
+.slot.tab-group {
+  border-style: solid;
+}
+
+.group-content {
+  position: relative;
+}
+
+.group-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--panel-border-selected);
+  margin-bottom: 0.5rem;
+}
+
+.group-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.group-panel-label {
+  font-size: 0.75rem;
+  color: var(--slot-content-text);
+  padding: 0.25rem 0.5rem;
+  background: var(--slot-preview-bg);
+  border-radius: 3px;
+  border-left: 3px solid var(--panel-border-selected);
+}
+
+.slot-panel-label {
+  font-weight: 600;
+  color: var(--slot-content-text);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.create-tab-group-btn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--panel-border-selected);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-tab-group-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slot-empty-state {
+  flex-direction: column;
+}

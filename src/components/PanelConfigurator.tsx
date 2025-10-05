@@ -8,10 +8,33 @@ export interface PanelDefinition {
   preview?: React.ReactNode;
 }
 
+export type PanelSlot =
+  | string                          // Single panel ID
+  | null                            // Empty slot
+  | PanelGroup;                     // Multiple panels grouped together
+
+export interface PanelGroup {
+  type: 'tabs' | 'tiles';
+  panels: string[];                 // Array of panel IDs
+  config?: TabsConfig | TilesConfig;
+}
+
+export interface TabsConfig {
+  defaultActiveTab?: number;        // Which tab is active by default (index)
+  tabPosition?: 'top' | 'bottom' | 'left' | 'right';
+}
+
+export interface TilesConfig {
+  direction?: 'horizontal' | 'vertical' | 'grid';
+  columns?: number;
+  rows?: number;
+  tileSizes?: number[];             // Size percentages for each tile
+}
+
 export interface PanelLayout {
-  left: string | null;
-  middle: string | null;
-  right: string | null;
+  left: PanelSlot;
+  middle: PanelSlot;
+  right: PanelSlot;
 }
 
 export interface PanelConfiguratorProps {
@@ -34,6 +57,19 @@ export interface PanelConfiguratorProps {
 type SlotPosition = 'left' | 'middle' | 'right';
 type Selection = { type: 'slot'; position: SlotPosition } | { type: 'panel'; id: string } | null;
 
+// Helper to check if a slot is a group
+const isGroup = (slot: PanelSlot): slot is PanelGroup => {
+  return slot !== null && typeof slot === 'object' && 'type' in slot;
+};
+
+// Helper to get panel IDs from a slot
+const getPanelIdsFromSlot = (slot: PanelSlot): string[] => {
+  if (slot === null) return [];
+  if (typeof slot === 'string') return [slot];
+  if (isGroup(slot)) return slot.panels;
+  return [];
+};
+
 /**
  * PanelConfigurator - Interactive UI for configuring panel layout
  *
@@ -52,6 +88,7 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
   const contextTheme = useTheme();
   const theme = themeProp || contextTheme.theme;
   const [selection, setSelection] = useState<Selection>(null);
+  const [multiSelectPanels, setMultiSelectPanels] = useState<string[]>([]);
 
   // Get panel by id
   const getPanelById = useCallback((id: string | null) => {
@@ -66,10 +103,32 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
 
   // Check if a panel is in use
   const isPanelInUse = useCallback((panelId: string) => {
-    return currentLayout.left === panelId ||
-           currentLayout.middle === panelId ||
-           currentLayout.right === panelId;
+    const leftIds = getPanelIdsFromSlot(currentLayout.left);
+    const middleIds = getPanelIdsFromSlot(currentLayout.middle);
+    const rightIds = getPanelIdsFromSlot(currentLayout.right);
+    return leftIds.includes(panelId) || middleIds.includes(panelId) || rightIds.includes(panelId);
   }, [currentLayout]);
+
+  // Remove panel from any slot
+  const removePanelFromLayout = useCallback((layout: PanelLayout, panelId: string): PanelLayout => {
+    const newLayout = { ...layout };
+    (['left', 'middle', 'right'] as SlotPosition[]).forEach((pos) => {
+      const slot = newLayout[pos];
+      if (slot === panelId) {
+        newLayout[pos] = null;
+      } else if (isGroup(slot)) {
+        const filteredPanels = slot.panels.filter(id => id !== panelId);
+        if (filteredPanels.length === 0) {
+          newLayout[pos] = null;
+        } else if (filteredPanels.length === 1) {
+          newLayout[pos] = filteredPanels[0];
+        } else {
+          newLayout[pos] = { ...slot, panels: filteredPanels };
+        }
+      }
+    });
+    return newLayout;
+  }, []);
 
   // Handle slot click
   const handleSlotClick = useCallback((position: SlotPosition) => {
@@ -89,49 +148,43 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
       setSelection(null);
     } else {
       // Assign panel to slot
-      const newLayout = { ...currentLayout };
-
-      // If the panel is already in another slot, remove it from there
-      Object.keys(newLayout).forEach((key) => {
-        if (newLayout[key as SlotPosition] === selection.id) {
-          newLayout[key as SlotPosition] = null;
-        }
-      });
-
-      // Assign to the clicked slot
+      let newLayout = removePanelFromLayout(currentLayout, selection.id);
       newLayout[position] = selection.id;
       onChange(newLayout);
       setSelection(null);
     }
-  }, [selection, currentLayout, onChange]);
+  }, [selection, currentLayout, onChange, removePanelFromLayout]);
 
-  // Handle panel click
-  const handlePanelClick = useCallback((panelId: string) => {
+  // Handle panel click (with shift for multi-select)
+  const handlePanelClick = useCallback((panelId: string, shiftKey: boolean = false) => {
+    // Multi-select mode with shift key
+    if (shiftKey && !selection) {
+      setMultiSelectPanels(prev =>
+        prev.includes(panelId) ? prev.filter(id => id !== panelId) : [...prev, panelId]
+      );
+      return;
+    }
+
     if (!selection) {
       // First click - select this panel
       setSelection({ type: 'panel', id: panelId });
+      setMultiSelectPanels([]);
       return;
     }
 
     if (selection.type === 'slot') {
       // Assign panel to the selected slot
-      const newLayout = { ...currentLayout };
-
-      // If the panel is already in another slot, remove it from there
-      Object.keys(newLayout).forEach((key) => {
-        if (newLayout[key as SlotPosition] === panelId) {
-          newLayout[key as SlotPosition] = null;
-        }
-      });
-
+      let newLayout = removePanelFromLayout(currentLayout, panelId);
       newLayout[selection.position] = panelId;
       onChange(newLayout);
       setSelection(null);
+      setMultiSelectPanels([]);
     } else {
       // Change selection to this panel
       setSelection({ type: 'panel', id: panelId });
+      setMultiSelectPanels([]);
     }
-  }, [selection, currentLayout, onChange]);
+  }, [selection, currentLayout, onChange, removePanelFromLayout]);
 
   // Handle slot clear (remove panel from slot)
   const handleSlotClear = useCallback((position: SlotPosition, e: React.MouseEvent) => {
@@ -140,7 +193,50 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
     newLayout[position] = null;
     onChange(newLayout);
     setSelection(null);
+    setMultiSelectPanels([]);
   }, [currentLayout, onChange]);
+
+  // Create tab group from multi-selected panels
+  const createTabGroup = useCallback((position: SlotPosition) => {
+    if (multiSelectPanels.length < 2) return;
+
+    let newLayout = { ...currentLayout };
+
+    // Remove all selected panels from current positions
+    multiSelectPanels.forEach(panelId => {
+      newLayout = removePanelFromLayout(newLayout, panelId);
+    });
+
+    // Create tab group in target position
+    newLayout[position] = {
+      type: 'tabs',
+      panels: multiSelectPanels,
+      config: { defaultActiveTab: 0, tabPosition: 'top' }
+    };
+
+    onChange(newLayout);
+    setMultiSelectPanels([]);
+    setSelection(null);
+  }, [multiSelectPanels, currentLayout, onChange, removePanelFromLayout]);
+
+  // Add panel to existing tab group - reserved for future use
+  // const addToTabGroup = useCallback((position: SlotPosition, panelId: string) => {
+  //   const slot = currentLayout[position];
+  //   if (!isGroup(slot) || slot.type !== 'tabs') return;
+
+  //   let newLayout = removePanelFromLayout(currentLayout, panelId);
+  //   const existingGroup = newLayout[position];
+
+  //   if (isGroup(existingGroup) && existingGroup.type === 'tabs') {
+  //     newLayout[position] = {
+  //       ...existingGroup,
+  //       panels: [...existingGroup.panels, panelId]
+  //     };
+  //   }
+
+  //   onChange(newLayout);
+  //   setSelection(null);
+  // }, [currentLayout, onChange, removePanelFromLayout]);
 
   // Check if item is selected
   const isSlotSelected = (position: SlotPosition) =>
@@ -192,32 +288,64 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
         <h3 className="section-title">Panel Layout (3 Slots)</h3>
         <div className="slots-container">
           {(['left', 'middle', 'right'] as SlotPosition[]).map((position) => {
-            const panelId = currentLayout[position];
-            const panel = getPanelById(panelId);
+            const slot = currentLayout[position];
             const selected = isSlotSelected(position);
+            const isTabGroup = isGroup(slot) && slot.type === 'tabs';
+            const isFilled = slot !== null;
 
             return (
               <div
                 key={position}
                 data-position={position}
-                className={`slot ${selected ? 'selected' : ''} ${panel ? 'filled' : 'empty'}`}
+                className={`slot ${selected ? 'selected' : ''} ${isFilled ? 'filled' : 'empty'} ${isTabGroup ? 'tab-group' : ''}`}
                 onClick={() => handleSlotClick(position)}
               >
-                {panel ? (
-                  <div className="slot-content">
-                    {panel.preview && (
-                      <div className="slot-preview">{panel.preview}</div>
+                {slot === null ? (
+                  <div className="slot-empty-state">
+                    Empty
+                    {multiSelectPanels.length >= 2 && (
+                      <button
+                        className="create-tab-group-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          createTabGroup(position);
+                        }}
+                      >
+                        + Tab Group
+                      </button>
                     )}
+                  </div>
+                ) : isGroup(slot) ? (
+                  <div className="slot-content group-content">
+                    <div className="group-badge">{slot.type === 'tabs' ? '📑 Tabs' : '🔲 Tiles'}</div>
+                    <div className="group-panels">
+                      {slot.panels.map(panelId => {
+                        const panel = getPanelById(panelId);
+                        return panel ? <span key={panelId} className="group-panel-label">{panel.label}</span> : null;
+                      })}
+                    </div>
                     <button
                       className="slot-clear-btn"
                       onClick={(e) => handleSlotClear(position, e)}
-                      aria-label={`Remove ${panel.label} from ${position} slot`}
+                      aria-label={`Remove group from ${position} slot`}
                     >
                       ×
                     </button>
                   </div>
                 ) : (
-                  <div className="slot-empty-state">Empty</div>
+                  <div className="slot-content">
+                    {getPanelById(slot)?.preview && (
+                      <div className="slot-preview">{getPanelById(slot)?.preview}</div>
+                    )}
+                    <div className="slot-panel-label">{getPanelById(slot)?.label}</div>
+                    <button
+                      className="slot-clear-btn"
+                      onClick={(e) => handleSlotClear(position, e)}
+                      aria-label={`Remove ${getPanelById(slot)?.label} from ${position} slot`}
+                    >
+                      ×
+                    </button>
+                  </div>
                 )}
               </div>
             );
@@ -228,16 +356,22 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
       <div className="configurator-section">
         <h3 className="section-title">
           Panels
+          {multiSelectPanels.length > 0 && (
+            <span className="multi-select-badge">
+              {multiSelectPanels.length} selected
+            </span>
+          )}
         </h3>
         <div className="available-panels">
           {sortedPanels.map((panel) => {
             const selected = isPanelSelected(panel.id);
+            const multiSelected = multiSelectPanels.includes(panel.id);
             const inUse = isPanelInUse(panel.id);
             return (
               <div
                 key={panel.id}
-                className={`available-panel ${selected ? 'selected' : ''} ${inUse ? 'in-use' : ''}`}
-                onClick={() => handlePanelClick(panel.id)}
+                className={`available-panel ${selected ? 'selected' : ''} ${multiSelected ? 'multi-selected' : ''} ${inUse ? 'in-use' : ''}`}
+                onClick={(e) => handlePanelClick(panel.id, e.shiftKey)}
               >
                 <div className="panel-label">{panel.label}</div>
                 {panel.preview && (
@@ -255,6 +389,18 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
             ? `Selected: ${selection.position} slot. Click another slot to swap, or click a panel to assign.`
             : `Selected: ${getPanelById(selection.id)?.label}. Click a slot to assign.`
           }
+        </div>
+      )}
+
+      {multiSelectPanels.length >= 2 && (
+        <div className="selection-hint multi-select-hint">
+          {multiSelectPanels.length} panels selected. Click an empty slot's "+ Tab Group" button to create a tab group.
+        </div>
+      )}
+
+      {multiSelectPanels.length > 0 && multiSelectPanels.length < 2 && (
+        <div className="selection-hint">
+          Shift+Click more panels to create a tab group (need at least 2).
         </div>
       )}
     </div>

@@ -160,3 +160,70 @@ export const ManyPanels: Story = {
     </ThemeProvider>
   ),
 };
+
+// Story demonstrating tab group creation workflow
+export const TabGroupWorkflow: Story = {
+  render: () => (
+    <ThemeProvider theme={terminalTheme}>
+      <div>
+        <div style={{
+          padding: '1rem',
+          background: '#2a2a2a',
+          color: '#00ff00',
+          borderRadius: '6px',
+          marginBottom: '1rem',
+          fontFamily: 'monospace',
+        }}>
+          <h3 style={{ marginTop: 0 }}>📑 How to Create Tab Groups:</h3>
+          <ol style={{ marginBottom: 0 }}>
+            <li><strong>Shift+Click</strong> multiple panels to select them (need at least 2)</li>
+            <li>Look for the <strong>"+ Tab Group"</strong> button in empty slots</li>
+            <li><strong>Click</strong> the button to create a tab group with your selected panels</li>
+          </ol>
+        </div>
+        <InteractivePanelConfigurator
+          panels={[
+            ...samplePanels,
+            { id: 'console', label: 'Console', preview: <div style={{ fontSize: '0.7rem' }}>💻 Console</div> },
+            { id: 'terminal', label: 'Terminal', preview: <div style={{ fontSize: '0.7rem' }}>⌨️ Terminal</div> },
+            { id: 'output', label: 'Output', preview: <div style={{ fontSize: '0.7rem' }}>📋 Output</div> },
+          ]}
+          initialLayout={{
+            left: null,
+            middle: 'main',
+            right: null,
+          }}
+        />
+      </div>
+    </ThemeProvider>
+  ),
+};
+
+// Story showing existing tab groups
+export const WithExistingTabGroups: Story = {
+  render: () => (
+    <ThemeProvider theme={terminalTheme}>
+      <InteractivePanelConfigurator
+        panels={[
+          ...samplePanels,
+          { id: 'console', label: 'Console', preview: <div style={{ fontSize: '0.7rem' }}>💻 Console</div> },
+          { id: 'terminal', label: 'Terminal', preview: <div style={{ fontSize: '0.7rem' }}>⌨️ Terminal</div> },
+          { id: 'output', label: 'Output', preview: <div style={{ fontSize: '0.7rem' }}>📋 Output</div> },
+        ]}
+        initialLayout={{
+          left: {
+            type: 'tabs',
+            panels: ['nav', 'tools'],
+            config: { defaultActiveTab: 0, tabPosition: 'top' }
+          },
+          middle: 'main',
+          right: {
+            type: 'tabs',
+            panels: ['console', 'terminal', 'output'],
+            config: { defaultActiveTab: 0, tabPosition: 'top' }
+          },
+        }}
+      />
+    </ThemeProvider>
+  ),
+};

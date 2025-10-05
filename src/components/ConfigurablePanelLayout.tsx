@@ -8,7 +8,8 @@ import {
   ImperativePanelGroupHandle,
 } from 'react-resizable-panels';
 import { PanelTheme, defaultLightTheme } from '../types/theme';
-import { PanelLayout } from './PanelConfigurator';
+import { PanelLayout, PanelSlot, PanelGroup as PanelGroupType, TabsConfig } from './PanelConfigurator';
+import { TabGroup } from './TabGroup';
 import './ConfigurablePanelLayout.css';
 
 export interface PanelDefinitionWithContent {
@@ -126,10 +127,34 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
     return panel?.content || null;
   }, [panels]);
 
+  // Helper to render a panel slot (handles single panels, groups, or null)
+  const renderPanelSlot = useCallback((slot: PanelSlot): ReactNode => {
+    if (slot === null) return null;
+
+    // Check if it's a group
+    if (typeof slot === 'object' && 'type' in slot) {
+      const group = slot as PanelGroupType;
+      if (group.type === 'tabs') {
+        return (
+          <TabGroup
+            panelIds={group.panels}
+            panels={panels}
+            config={group.config as TabsConfig}
+          />
+        );
+      }
+      // TODO: Handle tiles when implemented
+      return null;
+    }
+
+    // It's a single panel ID
+    return getPanelContent(slot as string);
+  }, [panels, getPanelContent]);
+
   // Get actual panel content from layout
-  const leftPanel = getPanelContent(layout.left);
-  const middlePanel = getPanelContent(layout.middle);
-  const rightPanel = getPanelContent(layout.right);
+  const leftPanel = renderPanelSlot(layout.left);
+  const middlePanel = renderPanelSlot(layout.middle);
+  const rightPanel = renderPanelSlot(layout.right);
 
   // State for current sizes
   const [leftSize, setLeftSize] = useState(collapsed.left ? 0 : defaultSizes.left);

@@ -188,3 +188,99 @@ export const DarkTheme: Story = {
     theme: defaultDarkTheme,
   },
 };
+
+// Extended panel set for tabs demo
+const extendedPanels: PanelDefinitionWithContent[] = [
+  ...samplePanels,
+  {
+    id: 'preview',
+    label: 'Preview',
+    content: (
+      <div style={{ padding: '20px' }}>
+        <h3>Preview Panel</h3>
+        <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '4px' }}>
+          Preview content goes here...
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: 'terminal',
+    label: 'Terminal',
+    content: (
+      <div style={{ padding: '20px', background: '#1e1e1e', color: '#00ff00', fontFamily: 'monospace' }}>
+        <div>$ npm run dev</div>
+        <div>Server started on http://localhost:3000</div>
+      </div>
+    ),
+  },
+  {
+    id: 'git',
+    label: 'Git',
+    content: (
+      <div style={{ padding: '20px' }}>
+        <h3>Git Panel</h3>
+        <div>Modified files: 3</div>
+        <div>Staged changes: 1</div>
+      </div>
+    ),
+  },
+];
+
+// Tab Groups - Single tab group in right panel
+export const WithTabGroup: Story = {
+  args: {
+    panels: extendedPanels,
+    layout: {
+      left: 'nav',
+      middle: 'main',
+      right: {
+        type: 'tabs',
+        panels: ['preview', 'terminal', 'git'],
+        config: { defaultActiveTab: 0, tabPosition: 'top' }
+      },
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 20, middle: 50, right: 30 },
+  },
+};
+
+// Tab Groups - Multiple tab groups
+export const MultipleTabGroups: Story = {
+  args: {
+    panels: extendedPanels,
+    layout: {
+      left: {
+        type: 'tabs',
+        panels: ['nav', 'tools'],
+        config: { defaultActiveTab: 0, tabPosition: 'top' }
+      },
+      middle: 'main',
+      right: {
+        type: 'tabs',
+        panels: ['preview', 'terminal', 'git'],
+        config: { defaultActiveTab: 0, tabPosition: 'top' }
+      },
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 20, middle: 50, right: 30 },
+  },
+};
+
+// Tab Groups - Bottom positioned tabs
+export const TabGroupBottomPosition: Story = {
+  args: {
+    panels: extendedPanels,
+    layout: {
+      left: 'nav',
+      middle: 'main',
+      right: {
+        type: 'tabs',
+        panels: ['preview', 'terminal', 'git'],
+        config: { defaultActiveTab: 0, tabPosition: 'bottom' }
+      },
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 20, middle: 50, right: 30 },
+  },
+};
