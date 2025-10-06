@@ -9,14 +9,15 @@ export { TabGroup, type TabGroupProps } from './components/TabGroup';
 export type {
   PanelOrientation,
   CollapsibleSide,
-  Theme,
+  ThemeMode,
   AnimationConfig,
   CollapseButtonConfig,
   PanelCallbacks,
 } from './types';
 
 // Theme exports
-export { type PanelTheme, defaultLightTheme, defaultDarkTheme } from './types/theme';
+export { type Theme } from '@a24z/industry-theme';
+export { mapThemeToPanelVars, mapThemeToTabVars } from './utils/themeMapping';
 
 export { useMediaQuery } from './hooks/useMediaQuery';
 export { useLocalStorage } from './hooks/useLocalStorage';

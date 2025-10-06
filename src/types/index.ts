@@ -2,7 +2,7 @@
 
 export type PanelOrientation = 'horizontal' | 'vertical';
 export type CollapsibleSide = 'left' | 'right' | 'both' | 'none';
-export type Theme = 'light' | 'dark' | 'auto';
+export type ThemeMode = 'light' | 'dark' | 'auto';
 export type MobileLayout = 'stack' | 'tabs' | 'drawer';
 export type TabletLayout = 'two-panel' | 'drawer-main';
 export type DesktopLayout = 'three-panel' | 'two-panel';

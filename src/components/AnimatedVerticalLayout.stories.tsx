@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { fn } from '@storybook/test';
 import React, { useState } from 'react';
+import { slateTheme } from '@a24z/industry-theme';
 
 import { AnimatedVerticalLayout, type AnimatedVerticalLayoutProps } from './AnimatedVerticalLayout';
 
@@ -127,6 +128,7 @@ export const Default: Story = {
     showCollapseButtons: false, // Hidden by default
     animationDuration: 300,
     animationEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    theme: slateTheme,
   },
   decorators: [
     Story => (
@@ -315,6 +317,7 @@ export const WithControls: Story = {
     minSizes: { top: 15, bottom: 15 },
     animationDuration: 400,
     animationEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    theme: slateTheme,
   },
   decorators: [
     Story => (
@@ -344,6 +347,7 @@ export const SlowAnimation: Story = {
     showCollapseButtons: true,
     animationDuration: 800,
     animationEasing: 'ease-in-out',
+    theme: slateTheme,
   },
   decorators: [
     Story => (
@@ -365,6 +369,7 @@ export const BothCollapsed: Story = {
     showCollapseButtons: true,
     animationDuration: 300,
     animationEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    theme: slateTheme,
   },
   decorators: [
     Story => (

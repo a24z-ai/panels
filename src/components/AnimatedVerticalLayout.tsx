@@ -5,7 +5,8 @@ import {
   PanelResizeHandle,
   ImperativePanelHandle,
 } from 'react-resizable-panels';
-import { PanelTheme, defaultLightTheme } from '../types/theme';
+import { Theme } from '@a24z/industry-theme';
+import { mapThemeToPanelVars } from '../utils/themeMapping';
 import './AnimatedVerticalLayout.css';
 
 export interface AnimatedVerticalLayoutProps {
@@ -55,7 +56,7 @@ export interface AnimatedVerticalLayoutProps {
   animationEasing?: string;
 
   /** Theme object for customizing colors */
-  theme?: PanelTheme;
+  theme: Theme;
 
   /** Callbacks for panel events */
   onTopCollapseStart?: () => void;
@@ -85,7 +86,7 @@ export const AnimatedVerticalLayout: React.FC<AnimatedVerticalLayoutProps> = ({
   showCollapseButtons = false,
   animationDuration = 300,
   animationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
-  theme = defaultLightTheme,
+  theme,
   onTopCollapseStart,
   onTopCollapseComplete,
   onTopExpandStart,
@@ -343,17 +344,7 @@ export const AnimatedVerticalLayout: React.FC<AnimatedVerticalLayoutProps> = ({
   }, []);
 
   // Apply theme as CSS variables
-  const themeStyles = {
-    '--panel-background': theme?.background || defaultLightTheme.background,
-    '--panel-border': theme?.border || defaultLightTheme.border,
-    '--panel-handle': theme?.handle || defaultLightTheme.handle,
-    '--panel-handle-hover': theme?.handleHover || defaultLightTheme.handleHover,
-    '--panel-handle-active': theme?.handleActive || defaultLightTheme.handleActive,
-    '--panel-button-bg': theme?.buttonBackground || defaultLightTheme.buttonBackground,
-    '--panel-button-hover': theme?.buttonHover || defaultLightTheme.buttonHover,
-    '--panel-button-border': theme?.buttonBorder || defaultLightTheme.buttonBorder,
-    '--panel-button-icon': theme?.buttonIcon || defaultLightTheme.buttonIcon,
-  } as React.CSSProperties;
+  const themeStyles = mapThemeToPanelVars(theme) as React.CSSProperties;
 
   const topPanelStyle =
     isTopAnimating && !isDragging

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { ConfigurablePanelLayout, PanelDefinitionWithContent } from './ConfigurablePanelLayout';
 import { PanelLayout } from './PanelConfigurator';
-import { defaultDarkTheme } from '../types/theme';
+import { slateTheme, terminalTheme } from '@a24z/industry-theme';
 import React, { useState } from 'react';
 
 const meta = {
@@ -102,6 +102,7 @@ export const Default: Story = {
     },
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 60, right: 20 },
+    theme: slateTheme,
   },
 };
 
@@ -116,6 +117,7 @@ export const DifferentLayout: Story = {
     },
     showCollapseButtons: true,
     defaultSizes: { left: 15, middle: 70, right: 15 },
+    theme: slateTheme,
   },
 };
 
@@ -130,6 +132,7 @@ export const WithEmptySlots: Story = {
     },
     showCollapseButtons: true,
     defaultSizes: { left: 25, middle: 75, right: 0 },
+    theme: slateTheme,
   },
 };
 
@@ -176,6 +179,7 @@ const InteractiveConfigurableLayout = () => {
           layout={layout}
           showCollapseButtons={true}
           defaultSizes={{ left: 20, middle: 60, right: 20 }}
+          theme={slateTheme}
         />
       </div>
     </div>
@@ -197,7 +201,7 @@ export const DarkTheme: Story = {
     },
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 60, right: 20 },
-    theme: defaultDarkTheme,
+    theme: terminalTheme,
   },
 };
 
@@ -254,6 +258,7 @@ export const WithTabGroup: Story = {
     },
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 50, right: 30 },
+    theme: slateTheme,
   },
 };
 
@@ -276,6 +281,7 @@ export const MultipleTabGroups: Story = {
     },
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 50, right: 30 },
+    theme: slateTheme,
   },
 };
 
@@ -294,5 +300,6 @@ export const TabGroupBottomPosition: Story = {
     },
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 50, right: 30 },
+    theme: slateTheme,
   },
 };

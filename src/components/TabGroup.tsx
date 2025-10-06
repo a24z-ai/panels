@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Theme } from '@a24z/industry-theme';
+import { mapThemeToTabVars } from '../utils/themeMapping';
 import { PanelDefinitionWithContent } from './ConfigurablePanelLayout';
 import { TabsConfig } from './PanelConfigurator';
 import './TabGroup.css';
@@ -15,6 +17,9 @@ export interface TabGroupProps {
 
   /** Optional class name */
   className?: string;
+
+  /** Theme object for customizing colors */
+  theme: Theme;
 }
 
 /**
@@ -25,9 +30,13 @@ export const TabGroup: React.FC<TabGroupProps> = ({
   panels,
   config = {},
   className = '',
+  theme,
 }) => {
   const { defaultActiveTab = 0, tabPosition = 'top', centered = false } = config;
   const [activeTabIndex, setActiveTabIndex] = useState(defaultActiveTab);
+
+  // Apply theme as CSS variables
+  const themeStyles = mapThemeToTabVars(theme) as React.CSSProperties;
 
   // Get panels in order
   const tabPanels = panelIds
@@ -78,7 +87,7 @@ export const TabGroup: React.FC<TabGroupProps> = ({
   ) : null;
 
   return (
-    <div className={`tab-group tab-position-${tabPosition} ${className}`}>
+    <div className={`tab-group tab-position-${tabPosition} ${className}`} style={themeStyles}>
       {(tabPosition === 'top' || tabPosition === 'left') && tabList}
       {tabContent}
       {(tabPosition === 'bottom' || tabPosition === 'right') && tabList}

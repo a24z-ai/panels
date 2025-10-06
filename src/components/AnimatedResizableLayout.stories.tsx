@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React, { useState } from 'react';
+import { slateTheme } from '@a24z/industry-theme';
 
 import { AnimatedResizableLayout, type AnimatedResizableLayoutProps } from './AnimatedResizableLayout';
 
@@ -127,6 +128,7 @@ export const Default: Story = {
     showCollapseButton: false, // Hidden by default
     animationDuration: 300,
     animationEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    theme: slateTheme,
   },
   decorators: [
     Story => (
@@ -280,6 +282,7 @@ export const WithControls: Story = {
     minSize: 15,
     animationDuration: 400,
     animationEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    theme: slateTheme,
   },
   decorators: [
     Story => (
@@ -307,6 +310,7 @@ export const SlowAnimation: Story = {
     minSize: 15,
     animationDuration: 800,
     animationEasing: 'ease-in-out',
+    theme: slateTheme,
   },
   decorators: [
     Story => (
@@ -326,6 +330,7 @@ export const RightCollapsible: Story = {
     minSize: 15,
     animationDuration: 300,
     animationEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    theme: slateTheme,
   },
   decorators: [
     Story => (

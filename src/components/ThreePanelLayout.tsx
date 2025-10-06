@@ -7,7 +7,8 @@ import {
   ImperativePanelHandle,
   ImperativePanelGroupHandle,
 } from 'react-resizable-panels';
-import { PanelTheme, defaultLightTheme } from '../types/theme';
+import { Theme } from '@a24z/industry-theme';
+import { mapThemeToPanelVars } from '../utils/themeMapping';
 import './ThreePanelLayout.css';
 
 export interface ThreePanelLayoutProps {
@@ -62,7 +63,7 @@ export interface ThreePanelLayoutProps {
   animationEasing?: string;
 
   /** Theme object for customizing colors */
-  theme?: PanelTheme;
+  theme: Theme;
 
   /** Callbacks for panel events */
   onLeftCollapseStart?: () => void;
@@ -92,7 +93,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   showCollapseButtons = true,
   animationDuration = 300,
   animationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
-  theme = defaultLightTheme,
+  theme,
   onLeftCollapseStart,
   onLeftCollapseComplete,
   onLeftExpandStart,
@@ -483,17 +484,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
       : undefined;
 
   // Apply theme as CSS variables
-  const themeStyles = {
-    '--panel-background': theme?.background || defaultLightTheme.background,
-    '--panel-border': theme?.border || defaultLightTheme.border,
-    '--panel-handle': theme?.handle || defaultLightTheme.handle,
-    '--panel-handle-hover': theme?.handleHover || defaultLightTheme.handleHover,
-    '--panel-handle-active': theme?.handleActive || defaultLightTheme.handleActive,
-    '--panel-button-bg': theme?.buttonBackground || defaultLightTheme.buttonBackground,
-    '--panel-button-hover': theme?.buttonHover || defaultLightTheme.buttonHover,
-    '--panel-button-border': theme?.buttonBorder || defaultLightTheme.buttonBorder,
-    '--panel-button-icon': theme?.buttonIcon || defaultLightTheme.buttonIcon,
-  } as React.CSSProperties;
+  const themeStyles = mapThemeToPanelVars(theme) as React.CSSProperties;
 
   const leftPanelMinSize = leftAnimating || rightAnimating ? 0 : minSizes.left;
   const rightPanelMinSize = leftAnimating || rightAnimating ? 0 : minSizes.right;

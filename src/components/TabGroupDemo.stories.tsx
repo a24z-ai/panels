@@ -186,6 +186,7 @@ const CompleteTabGroupDemo = () => {
             layout={layout}
             showCollapseButtons={true}
             defaultSizes={{ left: 20, middle: 50, right: 30 }}
+            theme={terminalTheme}
           />
         </div>
       </div>
@@ -219,6 +220,7 @@ export const IDELayout: Story = {
           }}
           showCollapseButtons={true}
           defaultSizes={{ left: 20, middle: 50, right: 30 }}
+          theme={terminalTheme}
         />
       </div>
     </ThemeProvider>

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { ThreePanelLayout } from './ThreePanelLayout';
-import { defaultDarkTheme } from '../types/theme';
+import { slateTheme, terminalTheme } from '@a24z/industry-theme';
 import React from 'react';
 
 const meta = {
@@ -83,6 +83,7 @@ export const Default: Story = {
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 60, right: 20 },
     minSizes: { left: 15, middle: 30, right: 15 },
+    theme: slateTheme,
   },
 };
 
@@ -92,7 +93,7 @@ export const DarkTheme: Story = {
     middlePanel: <MiddleContent />,
     rightPanel: <RightContent />,
     showCollapseButtons: true,
-    theme: defaultDarkTheme,
+    theme: terminalTheme,
     defaultSizes: { left: 20, middle: 60, right: 20 },
   },
   parameters: {
@@ -115,17 +116,7 @@ export const CustomTheme: Story = {
     middlePanel: <MiddleContent />,
     rightPanel: <RightContent />,
     showCollapseButtons: true,
-    theme: {
-      background: '#f8f9fa',
-      border: '#dee2e6',
-      handle: '#e9ecef',
-      handleHover: '#dee2e6',
-      handleActive: '#ced4da',
-      buttonBackground: '#ffffff',
-      buttonHover: '#f8f9fa',
-      buttonBorder: '#dee2e6',
-      buttonIcon: '#495057',
-    },
+    theme: slateTheme,
     defaultSizes: { left: 25, middle: 50, right: 25 },
   },
 };
@@ -138,6 +129,7 @@ export const LeftCollapsedInitially: Story = {
     collapsed: { left: true, right: false },
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 60, right: 20 },
+    theme: slateTheme,
   },
 };
 
@@ -149,6 +141,7 @@ export const BothCollapsedInitially: Story = {
     collapsed: { left: true, right: true },
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 60, right: 20 },
+    theme: slateTheme,
   },
 };
 
@@ -160,6 +153,7 @@ export const OnlyLeftCollapsible: Story = {
     collapsiblePanels: { left: true, right: false },
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 50, right: 30 },
+    theme: slateTheme,
   },
 };
 
@@ -171,6 +165,7 @@ export const OnlyRightCollapsible: Story = {
     collapsiblePanels: { left: false, right: true },
     showCollapseButtons: true,
     defaultSizes: { left: 30, middle: 50, right: 20 },
+    theme: slateTheme,
   },
 };
 
@@ -181,6 +176,7 @@ export const NoCollapseButtons: Story = {
     rightPanel: <RightContent />,
     showCollapseButtons: false,
     defaultSizes: { left: 20, middle: 60, right: 20 },
+    theme: slateTheme,
   },
 };
 
@@ -193,6 +189,7 @@ export const CustomAnimation: Story = {
     animationDuration: 600,
     animationEasing: 'ease-in-out',
     defaultSizes: { left: 20, middle: 60, right: 20 },
+    theme: slateTheme,
   },
 };
 
@@ -203,6 +200,7 @@ export const WithCallbacks: Story = {
     rightPanel: <RightContent />,
     showCollapseButtons: true,
     defaultSizes: { left: 20, middle: 60, right: 20 },
+    theme: slateTheme,
     onLeftCollapseStart: fn(),
     onLeftCollapseComplete: fn(),
     onLeftExpandStart: fn(),
