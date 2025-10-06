@@ -78,7 +78,7 @@ export const AnimatedVerticalLayout: React.FC<AnimatedVerticalLayoutProps> = ({
   bottomPanel,
   collapsiblePanels = { top: true, bottom: true },
   defaultSizes = { top: 30, bottom: 30 },
-  minSizes = { top: 15, bottom: 15 },
+  minSizes = { top: 5, bottom: 5 },
   className = '',
   collapsed = { top: false, bottom: false },
   style,

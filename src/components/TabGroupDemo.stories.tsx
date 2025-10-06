@@ -20,6 +20,7 @@ const demopanels: PanelDefinitionWithContent[] = [
   {
     id: 'nav',
     label: 'Navigation',
+    icon: '📁',
     preview: <div style={{ fontSize: '0.7rem' }}>📁 Nav Menu</div>,
     content: (
       <div style={{ padding: '20px' }}>
@@ -36,6 +37,7 @@ const demopanels: PanelDefinitionWithContent[] = [
   {
     id: 'main',
     label: 'Main Content',
+    icon: '📄',
     preview: <div style={{ fontSize: '0.7rem' }}>📄 Content</div>,
     content: (
       <div style={{ padding: '20px' }}>
@@ -48,6 +50,7 @@ const demopanels: PanelDefinitionWithContent[] = [
   {
     id: 'tools',
     label: 'Tools',
+    icon: '🔧',
     preview: <div style={{ fontSize: '0.7rem' }}>🔧 Tools</div>,
     content: (
       <div style={{ padding: '20px' }}>
@@ -60,6 +63,7 @@ const demopanels: PanelDefinitionWithContent[] = [
   {
     id: 'console',
     label: 'Console',
+    icon: '💻',
     preview: <div style={{ fontSize: '0.7rem' }}>💻 Console</div>,
     content: (
       <div style={{ padding: '20px', background: '#1e1e1e', color: '#00ff00', fontFamily: 'monospace', height: '100%' }}>
@@ -72,6 +76,7 @@ const demopanels: PanelDefinitionWithContent[] = [
   {
     id: 'terminal',
     label: 'Terminal',
+    icon: '⌨️',
     preview: <div style={{ fontSize: '0.7rem' }}>⌨️ Terminal</div>,
     content: (
       <div style={{ padding: '20px', background: '#000', color: '#0f0', fontFamily: 'monospace', height: '100%' }}>
@@ -82,6 +87,7 @@ const demopanels: PanelDefinitionWithContent[] = [
   {
     id: 'output',
     label: 'Output',
+    icon: '📋',
     preview: <div style={{ fontSize: '0.7rem' }}>📋 Output</div>,
     content: (
       <div style={{ padding: '20px' }}>
@@ -95,6 +101,7 @@ const demopanels: PanelDefinitionWithContent[] = [
   {
     id: 'preview',
     label: 'Preview',
+    icon: '👁️',
     preview: <div style={{ fontSize: '0.7rem' }}>👁️ Preview</div>,
     content: (
       <div style={{ padding: '20px' }}>
@@ -108,10 +115,11 @@ const demopanels: PanelDefinitionWithContent[] = [
 ];
 
 // Panel definitions without content (for configurator only)
-const demoPanelDefs: PanelDefinition[] = demopanels.map(({ id, label, preview }) => ({
+const demoPanelDefs: PanelDefinition[] = demopanels.map(({ id, label, preview, icon }) => ({
   id,
   label,
   preview,
+  icon,
 }));
 
 // Complete interactive example
@@ -122,7 +130,7 @@ const CompleteTabGroupDemo = () => {
     right: {
       type: 'tabs',
       panels: ['console', 'terminal', 'output'],
-      config: { defaultActiveTab: 0, tabPosition: 'top' }
+      config: { defaultActiveTab: 0, tabPosition: 'top', centered: true }
     },
   });
   const [showConfigurator, setShowConfigurator] = useState(false);
@@ -200,13 +208,13 @@ export const IDELayout: Story = {
             left: {
               type: 'tabs',
               panels: ['nav', 'tools'],
-              config: { defaultActiveTab: 0, tabPosition: 'top' }
+              config: { defaultActiveTab: 0, tabPosition: 'top', centered: false }
             },
             middle: 'main',
             right: {
               type: 'tabs',
               panels: ['preview', 'console', 'terminal', 'output'],
-              config: { defaultActiveTab: 0, tabPosition: 'top' }
+              config: { defaultActiveTab: 0, tabPosition: 'top', centered: true }
             },
           }}
           showCollapseButtons={true}

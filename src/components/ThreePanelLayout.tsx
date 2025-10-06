@@ -85,7 +85,7 @@ export const ThreePanelLayout: React.FC<ThreePanelLayoutProps> = ({
   rightPanel,
   collapsiblePanels = { left: true, right: true },
   defaultSizes = { left: 20, middle: 60, right: 20 },
-  minSizes = { left: 15, middle: 30, right: 15 },
+  minSizes = { left: 5, middle: 10, right: 5 },
   className = '',
   collapsed = { left: false, right: false },
   style,

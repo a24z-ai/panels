@@ -10,6 +10,17 @@ const meta = {
   parameters: {
     layout: 'fullscreen',
   },
+  args: {
+    onPanelResize: fn(),
+    onLeftCollapseStart: fn(),
+    onLeftCollapseComplete: fn(),
+    onLeftExpandStart: fn(),
+    onLeftExpandComplete: fn(),
+    onRightCollapseStart: fn(),
+    onRightCollapseComplete: fn(),
+    onRightExpandStart: fn(),
+    onRightExpandComplete: fn(),
+  },
   decorators: [
     (Story) => (
       <div style={{ height: '100vh', width: '100vw' }}>

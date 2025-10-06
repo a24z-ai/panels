@@ -45,6 +45,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  overflow: hidden;
 }
 
 .slot:hover {
@@ -87,6 +88,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .slot-panel-name {
@@ -116,6 +119,7 @@
   color: var(--slot-empty-text);
   font-size: 0.875rem;
   font-style: italic;
+  min-height: 0;
 }
 
 .slot-clear-btn {
@@ -250,6 +254,8 @@
 
 .group-content {
   position: relative;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .group-badge {
@@ -264,6 +270,8 @@
   flex-direction: column;
   gap: 0.25rem;
   flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .group-panel-label {
@@ -300,6 +308,114 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.slot-empty-state {
-  flex-direction: column;
+/* Tab mode toggle button */
+.tab-mode-toggle {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--slot-bg);
+  border: 1px solid var(--slot-border);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  opacity: 0.7;
+}
+
+.tab-mode-toggle:hover {
+  opacity: 1;
+  border-color: var(--slot-border-hover);
+  background: var(--slot-preview-bg);
+}
+
+.tab-mode-toggle.active {
+  opacity: 1;
+  background: var(--panel-border-selected);
+  color: white;
+  border-color: var(--panel-border-selected);
+}
+
+/* Tab configuration controls */
+.tab-config-controls {
+  margin-bottom: 0.5rem;
+}
+
+.tab-config-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--slot-label);
+}
+
+.tab-config-label select {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--slot-border);
+  border-radius: 3px;
+  background: var(--slot-bg);
+  color: var(--slot-content-text);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+/* Group panel item */
+.group-panel-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--slot-preview-bg);
+  border-radius: 3px;
+  border-left: 3px solid var(--panel-border-selected);
+}
+
+.group-panel-label {
+  flex: 1;
+  font-size: 0.75rem;
+  color: var(--slot-content-text);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.default-badge {
+  color: var(--panel-border-selected);
+  font-size: 0.9em;
+}
+
+.remove-from-group-btn {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: var(--clear-btn-bg);
+  color: var(--clear-btn-text);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.remove-from-group-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Usage hint */
+.usage-hint {
+  padding: 0.75rem 1rem;
+  background: var(--slot-preview-bg);
+  border: 1px solid var(--slot-border);
+  border-radius: 6px;
+  color: var(--hint-text);
+  font-size: 0.875rem;
+  text-align: center;
 }

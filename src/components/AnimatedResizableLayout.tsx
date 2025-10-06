@@ -67,7 +67,7 @@ export const AnimatedResizableLayout: React.FC<AnimatedResizableLayoutProps> = (
   rightPanel,
   collapsibleSide = 'left',
   defaultSize = 25,
-  minSize = 15,
+  minSize = 5,
   className = '',
   collapsed = false,
   style,

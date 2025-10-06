@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { ConfigurablePanelLayout, PanelDefinitionWithContent } from './ConfigurablePanelLayout';
 import { PanelLayout } from './PanelConfigurator';
 import { defaultDarkTheme } from '../types/theme';
@@ -9,6 +10,17 @@ const meta = {
   component: ConfigurablePanelLayout,
   parameters: {
     layout: 'fullscreen',
+  },
+  args: {
+    onPanelResize: fn(),
+    onLeftCollapseStart: fn(),
+    onLeftCollapseComplete: fn(),
+    onLeftExpandStart: fn(),
+    onLeftExpandComplete: fn(),
+    onRightCollapseStart: fn(),
+    onRightCollapseComplete: fn(),
+    onRightExpandStart: fn(),
+    onRightExpandComplete: fn(),
   },
   decorators: [
     (Story) => (

@@ -176,9 +176,11 @@ export const TabGroupWorkflow: Story = {
         }}>
           <h3 style={{ marginTop: 0 }}>📑 How to Create Tab Groups:</h3>
           <ol style={{ marginBottom: 0 }}>
-            <li><strong>Shift+Click</strong> multiple panels to select them (need at least 2)</li>
-            <li>Look for the <strong>"+ Tab Group"</strong> button in empty slots</li>
-            <li><strong>Click</strong> the button to create a tab group with your selected panels</li>
+            <li>Click the <strong>🗂️ Off</strong> toggle on any slot to enable Tab Mode</li>
+            <li>With the slot selected, click panels to add them to the tab group</li>
+            <li>Configure tab position (top/bottom/left/right) using the dropdown</li>
+            <li>Remove panels from the group using the × button next to each panel</li>
+            <li>Toggle 🗂️ again to convert back to single panel mode</li>
           </ol>
         </div>
         <InteractivePanelConfigurator

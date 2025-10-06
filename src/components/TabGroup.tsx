@@ -26,7 +26,7 @@ export const TabGroup: React.FC<TabGroupProps> = ({
   config = {},
   className = '',
 }) => {
-  const { defaultActiveTab = 0, tabPosition = 'top' } = config;
+  const { defaultActiveTab = 0, tabPosition = 'top', centered = false } = config;
   const [activeTabIndex, setActiveTabIndex] = useState(defaultActiveTab);
 
   // Get panels in order
@@ -44,7 +44,7 @@ export const TabGroup: React.FC<TabGroupProps> = ({
   }
 
   const tabList = (
-    <div className="tab-list" role="tablist">
+    <div className={`tab-list ${centered ? 'centered' : ''}`} role="tablist">
       {tabPanels.map((panel, index) => (
         <button
           key={panel.id}
@@ -54,8 +54,13 @@ export const TabGroup: React.FC<TabGroupProps> = ({
           id={`tab-${panel.id}`}
           className={`tab-button ${index === safeActiveIndex ? 'active' : ''}`}
           onClick={() => setActiveTabIndex(index)}
+          title={panel.icon ? panel.label : undefined}
         >
-          {panel.label}
+          {panel.icon ? (
+            <span className="tab-icon">{panel.icon}</span>
+          ) : (
+            panel.label
+          )}
         </button>
       ))}
     </div>
