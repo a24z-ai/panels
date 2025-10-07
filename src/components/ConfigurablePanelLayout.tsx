@@ -152,7 +152,7 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
 
     // It's a single panel ID
     return getPanelContent(slot as string);
-  }, [panels, getPanelContent]);
+  }, [panels, getPanelContent, theme]);
 
   // Get actual panel content from layout
   const leftPanel = renderPanelSlot(layout.left);

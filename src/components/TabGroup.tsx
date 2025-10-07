@@ -32,7 +32,7 @@ export const TabGroup: React.FC<TabGroupProps> = ({
   className = '',
   theme,
 }) => {
-  const { defaultActiveTab = 0, tabPosition = 'top', centered = false } = config;
+  const { defaultActiveTab = 0, tabPosition = 'top', centered = true } = config;
   const [activeTabIndex, setActiveTabIndex] = useState(defaultActiveTab);
 
   // Apply theme as CSS variables

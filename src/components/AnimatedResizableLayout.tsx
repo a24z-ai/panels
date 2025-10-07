@@ -205,6 +205,7 @@ export const AnimatedResizableLayout: React.FC<AnimatedResizableLayoutProps> = (
         handleExpand();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleCollapse/handleExpand would cause infinite loop
   }, [collapsed]);
 
   // Update hideHandle when collapsed prop changes externally
@@ -217,12 +218,14 @@ export const AnimatedResizableLayout: React.FC<AnimatedResizableLayoutProps> = (
   }, [collapsed, isAnimating]);
 
   useEffect(() => {
+    const animationFrame = animationFrameRef.current;
+    const animationTimeout = animationTimeoutRef.current;
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
       }
-      if (animationTimeoutRef.current) {
-        clearTimeout(animationTimeoutRef.current);
+      if (animationTimeout) {
+        clearTimeout(animationTimeout);
       }
     };
   }, []);

@@ -318,6 +318,7 @@ export const AnimatedVerticalLayout: React.FC<AnimatedVerticalLayoutProps> = ({
         handleTopExpand();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleTopCollapse/handleTopExpand would cause infinite loop
   }, [collapsed.top]);
 
   // Sync bottom panel with external prop changes
@@ -329,6 +330,7 @@ export const AnimatedVerticalLayout: React.FC<AnimatedVerticalLayoutProps> = ({
         handleBottomExpand();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleBottomCollapse/handleBottomExpand would cause infinite loop
   }, [collapsed.bottom]);
 
   // Cleanup
