@@ -20,27 +20,27 @@ const samplePanels: PanelDefinition[] = [
   {
     id: 'nav',
     label: 'Navigation',
-    preview: <div style={{ fontSize: '0.7rem' }}>📁 Nav Menu</div>,
+    preview: <div style={{ fontSize: '0.7rem' }}>Nav Menu</div>,
   },
   {
     id: 'main',
     label: 'Main Content',
-    preview: <div style={{ fontSize: '0.7rem' }}>📄 Content</div>,
+    preview: <div style={{ fontSize: '0.7rem' }}>Content</div>,
   },
   {
     id: 'sidebar',
     label: 'Sidebar',
-    preview: <div style={{ fontSize: '0.7rem' }}>📊 Stats</div>,
+    preview: <div style={{ fontSize: '0.7rem' }}>Stats</div>,
   },
   {
     id: 'tools',
     label: 'Tools Panel',
-    preview: <div style={{ fontSize: '0.7rem' }}>🔧 Tools</div>,
+    preview: <div style={{ fontSize: '0.7rem' }}>Tools</div>,
   },
   {
     id: 'properties',
     label: 'Properties',
-    preview: <div style={{ fontSize: '0.7rem' }}>⚙️ Props</div>,
+    preview: <div style={{ fontSize: '0.7rem' }}>Props</div>,
   },
 ];
 
@@ -147,9 +147,9 @@ export const ManyPanels: Story = {
       <InteractivePanelConfigurator
         panels={[
           ...samplePanels,
-          { id: 'console', label: 'Console', preview: <div style={{ fontSize: '0.7rem' }}>💻 Console</div> },
-          { id: 'terminal', label: 'Terminal', preview: <div style={{ fontSize: '0.7rem' }}>⌨️ Terminal</div> },
-          { id: 'output', label: 'Output', preview: <div style={{ fontSize: '0.7rem' }}>📋 Output</div> },
+          { id: 'console', label: 'Console', preview: <div style={{ fontSize: '0.7rem' }}>Console</div> },
+          { id: 'terminal', label: 'Terminal', preview: <div style={{ fontSize: '0.7rem' }}>Terminal</div> },
+          { id: 'output', label: 'Output', preview: <div style={{ fontSize: '0.7rem' }}>Output</div> },
         ]}
         initialLayout={{
           left: 'nav',
@@ -174,21 +174,21 @@ export const TabGroupWorkflow: Story = {
           marginBottom: '1rem',
           fontFamily: 'monospace',
         }}>
-          <h3 style={{ marginTop: 0 }}>📑 How to Create Tab Groups:</h3>
+          <h3 style={{ marginTop: 0 }}>How to Create Tab Groups:</h3>
           <ol style={{ marginBottom: 0 }}>
-            <li>Click the <strong>🗂️ Off</strong> toggle on any slot to enable Tab Mode</li>
+            <li>Click the tab icon toggle on any slot to enable Tab Mode</li>
             <li>With the slot selected, click panels to add them to the tab group</li>
             <li>Configure tab position (top/bottom/left/right) using the dropdown</li>
             <li>Remove panels from the group using the × button next to each panel</li>
-            <li>Toggle 🗂️ again to convert back to single panel mode</li>
+            <li>Toggle the tab icon again to convert back to single panel mode</li>
           </ol>
         </div>
         <InteractivePanelConfigurator
           panels={[
             ...samplePanels,
-            { id: 'console', label: 'Console', preview: <div style={{ fontSize: '0.7rem' }}>💻 Console</div> },
-            { id: 'terminal', label: 'Terminal', preview: <div style={{ fontSize: '0.7rem' }}>⌨️ Terminal</div> },
-            { id: 'output', label: 'Output', preview: <div style={{ fontSize: '0.7rem' }}>📋 Output</div> },
+            { id: 'console', label: 'Console', preview: <div style={{ fontSize: '0.7rem' }}>Console</div> },
+            { id: 'terminal', label: 'Terminal', preview: <div style={{ fontSize: '0.7rem' }}>Terminal</div> },
+            { id: 'output', label: 'Output', preview: <div style={{ fontSize: '0.7rem' }}>Output</div> },
           ]}
           initialLayout={{
             left: null,
@@ -208,9 +208,9 @@ export const WithExistingTabGroups: Story = {
       <InteractivePanelConfigurator
         panels={[
           ...samplePanels,
-          { id: 'console', label: 'Console', preview: <div style={{ fontSize: '0.7rem' }}>💻 Console</div> },
-          { id: 'terminal', label: 'Terminal', preview: <div style={{ fontSize: '0.7rem' }}>⌨️ Terminal</div> },
-          { id: 'output', label: 'Output', preview: <div style={{ fontSize: '0.7rem' }}>📋 Output</div> },
+          { id: 'console', label: 'Console', preview: <div style={{ fontSize: '0.7rem' }}>Console</div> },
+          { id: 'terminal', label: 'Terminal', preview: <div style={{ fontSize: '0.7rem' }}>Terminal</div> },
+          { id: 'output', label: 'Output', preview: <div style={{ fontSize: '0.7rem' }}>Output</div> },
         ]}
         initialLayout={{
           left: {

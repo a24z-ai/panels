@@ -131,6 +131,19 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
     return newLayout;
   }, []);
 
+  // Toggle panel in/out of tab group (preserves tab mode)
+  const togglePanelInTabGroup = useCallback((position: SlotPosition, panelId: string) => {
+    const slot = currentLayout[position];
+    if (!isGroup(slot) || slot.type !== 'tabs') return;
+
+    const filteredPanels = slot.panels.filter(id => id !== panelId);
+    const newLayout = { ...currentLayout };
+
+    // Always keep tab mode structure, just update panels array
+    newLayout[position] = { ...slot, panels: filteredPanels };
+    onChange(newLayout);
+  }, [currentLayout, onChange]);
+
   // Toggle tab mode for a slot
   const toggleTabMode = useCallback((position: SlotPosition, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -141,6 +154,7 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
       const newLayout = { ...currentLayout };
       newLayout[position] = slot.panels.length > 0 ? slot.panels[0] : null;
       onChange(newLayout);
+      setSelection(null);
     } else {
       // Enable tab mode
       const panels: string[] = slot && typeof slot === 'string' ? [slot] : [];
@@ -151,6 +165,8 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
         config: { defaultActiveTab: 0, tabPosition: 'top' }
       };
       onChange(newLayout);
+      // Automatically select the slot so user can immediately add panels
+      setSelection({ type: 'slot', position });
     }
   }, [currentLayout, onChange]);
 
@@ -179,23 +195,24 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
       // Assign panel to slot
       const slot = currentLayout[position];
 
-      // If slot is in tab mode, add panel to the tab group
+      // If slot is in tab mode, add/remove panel from the tab group
       if (isGroup(slot) && slot.type === 'tabs') {
-        // Check if panel is already in this group
+        // Check if panel is already in this group - if so, remove it
         if (slot.panels.includes(selection.id)) {
-          setSelection(null);
+          togglePanelInTabGroup(position, selection.id);
+          // Keep slot selected so user can add more panels
           return;
         }
 
+        // Save the current group before removing the panel from layout
+        const currentGroup = slot;
         const newLayout = removePanelFromLayout(currentLayout, selection.id);
-        const existingGroup = newLayout[position];
 
-        if (isGroup(existingGroup) && existingGroup.type === 'tabs') {
-          newLayout[position] = {
-            ...existingGroup,
-            panels: [...existingGroup.panels, selection.id]
-          };
-        }
+        // Add panel to the saved group (preserving tab mode even if removePanelFromLayout modified it)
+        newLayout[position] = {
+          ...currentGroup,
+          panels: [...currentGroup.panels, selection.id]
+        };
 
         onChange(newLayout);
         // Keep slot selected so user can add more panels
@@ -208,7 +225,7 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
         setSelection(null);
       }
     }
-  }, [selection, currentLayout, onChange, removePanelFromLayout]);
+  }, [selection, currentLayout, onChange, removePanelFromLayout, togglePanelInTabGroup]);
 
   // Handle panel click
   const handlePanelClick = useCallback((panelId: string) => {
@@ -222,26 +239,28 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
       // Assign panel to the selected slot
       const slot = currentLayout[selection.position];
 
-      // If slot is in tab mode, add panel to the tab group
+      // If slot is in tab mode, add/remove panel from the tab group
       if (isGroup(slot) && slot.type === 'tabs') {
-        // Check if panel is already in this group
+        // Check if panel is already in this group - if so, remove it
         if (slot.panels.includes(panelId)) {
-          setSelection(null);
+          togglePanelInTabGroup(selection.position, panelId);
+          // Keep slot selected so user can add more panels
           return;
         }
 
+        // Save the current group before removing the panel from layout
+        const currentGroup = slot;
         const newLayout = removePanelFromLayout(currentLayout, panelId);
-        const existingGroup = newLayout[selection.position];
 
-        if (isGroup(existingGroup) && existingGroup.type === 'tabs') {
-          newLayout[selection.position] = {
-            ...existingGroup,
-            panels: [...existingGroup.panels, panelId]
-          };
-        }
+        // Add panel to the saved group (preserving tab mode even if removePanelFromLayout modified it)
+        newLayout[selection.position] = {
+          ...currentGroup,
+          panels: [...currentGroup.panels, panelId]
+        };
 
         onChange(newLayout);
-        setSelection(null);
+        // Keep slot selected so user can add more panels
+        return;
       } else {
         // Replace slot with panel
         const newLayout = removePanelFromLayout(currentLayout, panelId);
@@ -253,7 +272,7 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
       // Change selection to this panel
       setSelection({ type: 'panel', id: panelId });
     }
-  }, [selection, currentLayout, onChange, removePanelFromLayout]);
+  }, [selection, currentLayout, onChange, removePanelFromLayout, togglePanelInTabGroup]);
 
   // Handle slot clear (remove panel from slot)
   const handleSlotClear = useCallback((position: SlotPosition, e: React.MouseEvent) => {
@@ -264,7 +283,7 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
     setSelection(null);
   }, [currentLayout, onChange]);
 
-  // Remove panel from tab group
+  // Remove panel from tab group (preserves tab mode)
   const removePanelFromTabGroup = useCallback((position: SlotPosition, panelId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const slot = currentLayout[position];
@@ -273,14 +292,8 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
     const filteredPanels = slot.panels.filter(id => id !== panelId);
     const newLayout = { ...currentLayout };
 
-    if (filteredPanels.length === 0) {
-      newLayout[position] = null;
-    } else if (filteredPanels.length === 1) {
-      // Only one panel left, convert back to single panel
-      newLayout[position] = filteredPanels[0];
-    } else {
-      newLayout[position] = { ...slot, panels: filteredPanels };
-    }
+    // Always preserve tab mode structure, just update panels array
+    newLayout[position] = { ...slot, panels: filteredPanels };
 
     onChange(newLayout);
   }, [currentLayout, onChange]);
@@ -371,10 +384,10 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
                   onClick={(e) => toggleTabMode(position, e)}
                   title={isTabGroup ? 'Disable tab mode' : 'Enable tab mode'}
                 >
-                  🗂️
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M2 2h4v2H2V2zm5 0h4v2H7V2zm5 0h2v2h-2V2zM2 5h12v9H2V5zm1 1v7h10V6H3z"/>
+                  </svg>
                 </button>
-
-                {!isTabGroup && <div className="slot-label">{position}</div>}
 
                 {slot === null ? (
                   <div className="slot-empty-state">
@@ -483,7 +496,10 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
       )}
 
       <div className="usage-hint">
-        💡 <strong>Tip:</strong> Toggle 🗂️ on a slot to enable tab mode, then click panels to add multiple tabs.
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ verticalAlign: 'text-bottom', marginRight: '4px' }}>
+          <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1a6 6 0 110 12A6 6 0 018 2zm.5 3.5v3h-1v-3h1zm0 4v1h-1v-1h1z"/>
+        </svg>
+        <strong>Tip:</strong> Toggle the tab icon on a slot to enable tab mode, then click panels to add multiple tabs.
       </div>
     </div>
   );
