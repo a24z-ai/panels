@@ -163,6 +163,10 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   const [leftSize, setLeftSize] = useState(collapsed.left ? 0 : defaultSizes.left);
   const [rightSize, setRightSize] = useState(collapsed.right ? 0 : defaultSizes.right);
 
+  // State to preserve the last expanded size for collapsed panels
+  const [lastExpandedLeftSize, setLastExpandedLeftSize] = useState(defaultSizes.left);
+  const [lastExpandedRightSize, setLastExpandedRightSize] = useState(defaultSizes.right);
+
   // Panel refs
   const panelGroupRef = useRef<ImperativePanelGroupHandle>(null);
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
@@ -291,15 +295,17 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
     }
 
     leftAnimationFrameRef.current = requestAnimationFrame(() => {
+      // Use the last expanded size to restore the panel to its previous size
+      const targetSize = lastExpandedLeftSize || defaultSizes.left;
 
       animatePanel(
         leftPanelRef,
         0,
-        defaultSizes.left,
+        targetSize,
         leftAnimationFrameRef,
         leftStartTimeRef,
         () => {
-          setLeftSize(defaultSizes.left);
+          setLeftSize(targetSize);
           setLeftAnimating(false);
           if (onLeftExpandComplete) onLeftExpandComplete();
         }
@@ -309,6 +315,7 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
     leftAnimating,
     isDragging,
     defaultSizes.left,
+    lastExpandedLeftSize,
     collapsiblePanels.left,
     animatePanel,
     onLeftExpandStart,
@@ -371,14 +378,17 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
     }
 
     rightAnimationFrameRef.current = requestAnimationFrame(() => {
+      // Use the last expanded size to restore the panel to its previous size
+      const targetSize = lastExpandedRightSize || defaultSizes.right;
+
       animatePanel(
         rightPanelRef,
         0,
-        defaultSizes.right,
+        targetSize,
         rightAnimationFrameRef,
         rightStartTimeRef,
         () => {
-          setRightSize(defaultSizes.right);
+          setRightSize(targetSize);
           setRightAnimating(false);
           if (onRightExpandComplete) onRightExpandComplete();
         }
@@ -388,6 +398,7 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
     rightAnimating,
     isDragging,
     defaultSizes.right,
+    lastExpandedRightSize,
     collapsiblePanels.right,
     animatePanel,
     onRightExpandStart,
@@ -415,7 +426,9 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   const handleLeftResize = useCallback((size: number) => {
     if (!leftAnimating && !rightAnimating) {
       setLeftSize(size);
+      // Track the last expanded size (only when > 0)
       if (size > 0) {
+        setLastExpandedLeftSize(size);
         setLeftCollapsed(false);
       }
     }
@@ -424,7 +437,9 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   const handleRightResize = useCallback((size: number) => {
     if (!leftAnimating && !rightAnimating) {
       setRightSize(size);
+      // Track the last expanded size (only when > 0)
       if (size > 0) {
+        setLastExpandedRightSize(size);
         setRightCollapsed(false);
       }
     }
@@ -433,13 +448,17 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   // Drag handlers
   const handleDragEnd = useCallback(() => {
     if (onPanelResize) {
+      // Use the last expanded size for collapsed panels to preserve their size
+      const reportedLeftSize = leftCollapsed ? lastExpandedLeftSize : leftSize;
+      const reportedRightSize = rightCollapsed ? lastExpandedRightSize : rightSize;
+
       onPanelResize({
-        left: leftSize,
-        middle: 100 - leftSize - rightSize,
-        right: rightSize,
+        left: reportedLeftSize,
+        middle: 100 - reportedLeftSize - reportedRightSize,
+        right: reportedRightSize,
       });
     }
-  }, [leftSize, rightSize, onPanelResize]);
+  }, [leftSize, rightSize, leftCollapsed, rightCollapsed, lastExpandedLeftSize, lastExpandedRightSize, onPanelResize]);
 
   const handleDragging = useCallback(
     (dragging: boolean) => {
