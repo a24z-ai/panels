@@ -156,13 +156,13 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
       onChange(newLayout);
       setSelection(null);
     } else {
-      // Enable tab mode
+      // Enable tab mode - top/bottom are auto-centered
       const panels: string[] = slot && typeof slot === 'string' ? [slot] : [];
       const newLayout = { ...currentLayout };
       newLayout[position] = {
         type: 'tabs',
         panels,
-        config: { defaultActiveTab: 0, tabPosition: 'top' }
+        config: { defaultActiveTab: 0, tabPosition: 'top' } // Top/bottom auto-center
       };
       onChange(newLayout);
       // Automatically select the slot so user can immediately add panels
@@ -398,14 +398,14 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
                     {slot.type === 'tabs' && slot.panels.length > 0 && (
                       <div className="tab-config-controls">
                         <label className="tab-config-label">
-                          Position:
+                          Tabs:
                           <select
                             value={(slot.config as TabsConfig)?.tabPosition || 'top'}
                             onChange={(e) => updateTabConfig(position, { tabPosition: e.target.value as 'top' | 'bottom' | 'left' | 'right' })}
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <option value="top">Top</option>
-                            <option value="bottom">Bottom</option>
+                            <option value="top">Top (centered)</option>
+                            <option value="bottom">Bottom (centered)</option>
                             <option value="left">Left</option>
                             <option value="right">Right</option>
                           </select>

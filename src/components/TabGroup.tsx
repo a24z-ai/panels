@@ -52,8 +52,11 @@ export const TabGroup: React.FC<TabGroupProps> = ({
     return <div className="tab-group-empty">No panels available</div>;
   }
 
+  // For top/bottom positions, always center. For left/right, use the centered config
+  const shouldCenter = (tabPosition === 'top' || tabPosition === 'bottom') ? true : centered;
+
   const tabList = (
-    <div className={`tab-list ${centered ? 'centered' : ''}`} role="tablist">
+    <div className={`tab-list ${shouldCenter ? 'centered' : ''}`} role="tablist">
       {tabPanels.map((panel, index) => (
         <button
           key={panel.id}

@@ -130,7 +130,7 @@ const CompleteTabGroupDemo = () => {
     right: {
       type: 'tabs',
       panels: ['console', 'terminal', 'output'],
-      config: { defaultActiveTab: 0, tabPosition: 'top', centered: true }
+      config: { defaultActiveTab: 0, tabPosition: 'top' }
     },
   });
   const [showConfigurator, setShowConfigurator] = useState(false);
@@ -209,13 +209,13 @@ export const IDELayout: Story = {
             left: {
               type: 'tabs',
               panels: ['nav', 'tools'],
-              config: { defaultActiveTab: 0, tabPosition: 'top', centered: false }
+              config: { defaultActiveTab: 0, tabPosition: 'top' }
             },
             middle: 'main',
             right: {
               type: 'tabs',
               panels: ['preview', 'console', 'terminal', 'output'],
-              config: { defaultActiveTab: 0, tabPosition: 'top', centered: true }
+              config: { defaultActiveTab: 0, tabPosition: 'top' }
             },
           }}
           showCollapseButtons={true}
