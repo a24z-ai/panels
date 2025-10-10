@@ -28,6 +28,10 @@
 .three-panel-item.collapsible-panel.collapsed {
   flex: 0 !important;
   min-width: 0 !important;
+  max-width: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden;
 }
 
 .three-panel-item.middle-panel {
@@ -97,6 +101,7 @@
 
 .resize-handle.collapsed {
   width: 0 !important;
+  visibility: hidden;
 }
 
 .resize-handle.left-handle.collapsed {

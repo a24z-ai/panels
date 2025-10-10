@@ -60,7 +60,11 @@
   white-space: nowrap;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  height: 32px;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .tab-icon {

@@ -31,21 +31,22 @@ export interface ConfigurablePanelLayoutProps {
   /** Which panels are collapsible */
   collapsiblePanels?: {
     left?: boolean;
+    middle?: boolean;
     right?: boolean;
   };
 
   /** Default sizes for each panel (0-100, must sum to 100) */
   defaultSizes?: {
-    left: number;
-    middle: number;
-    right: number;
+    left?: number;
+    middle?: number;
+    right?: number;
   };
 
   /** Minimum sizes for each panel when expanded (0-100) */
   minSizes?: {
-    left: number;
-    middle: number;
-    right: number;
+    left?: number;
+    middle?: number;
+    right?: number;
   };
 
   /** CSS class for the layout container */
@@ -54,6 +55,7 @@ export interface ConfigurablePanelLayoutProps {
   /** Initial collapsed state for panels */
   collapsed?: {
     left?: boolean;
+    middle?: boolean;
     right?: boolean;
   };
 
@@ -77,6 +79,10 @@ export interface ConfigurablePanelLayoutProps {
   onLeftCollapseComplete?: () => void;
   onLeftExpandStart?: () => void;
   onLeftExpandComplete?: () => void;
+  onMiddleCollapseStart?: () => void;
+  onMiddleCollapseComplete?: () => void;
+  onMiddleExpandStart?: () => void;
+  onMiddleExpandComplete?: () => void;
   onRightCollapseStart?: () => void;
   onRightCollapseComplete?: () => void;
   onRightExpandStart?: () => void;
@@ -90,11 +96,11 @@ export interface ConfigurablePanelLayoutProps {
 export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = ({
   panels,
   layout,
-  collapsiblePanels = { left: true, right: true },
+  collapsiblePanels = { left: true, middle: false, right: true },
   defaultSizes = { left: 20, middle: 60, right: 20 },
   minSizes = { left: 5, middle: 10, right: 5 },
   className = '',
-  collapsed = { left: false, right: false },
+  collapsed = { left: false, middle: false, right: false },
   style,
   showCollapseButtons = true,
   animationDuration = 300,
@@ -104,22 +110,48 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   onLeftCollapseComplete,
   onLeftExpandStart,
   onLeftExpandComplete,
+  onMiddleCollapseStart,
+  onMiddleCollapseComplete,
+  onMiddleExpandStart,
+  onMiddleExpandComplete,
   onRightCollapseStart,
   onRightCollapseComplete,
   onRightExpandStart,
   onRightExpandComplete,
   onPanelResize,
 }) => {
-  // State for collapsed status
-  const [leftCollapsed, setLeftCollapsed] = useState(collapsed.left || false);
-  const [rightCollapsed, setRightCollapsed] = useState(collapsed.right || false);
+  // Auto-detect which panels are active (have content)
+  const isLeftActive = layout.left !== null;
+  const isMiddleActive = layout.middle !== null;
+  const isRightActive = layout.right !== null;
+
+  // Compute smart defaults based on active panels
+  const activeCount = [isLeftActive, isMiddleActive, isRightActive].filter(Boolean).length;
+  const computedDefaultSizes = {
+    left: isLeftActive ? (defaultSizes?.left ?? (activeCount === 2 ? 40 : 20)) : 0,
+    middle: isMiddleActive ? (defaultSizes?.middle ?? (activeCount === 2 ? 60 : 60)) : 0,
+    right: isRightActive ? (defaultSizes?.right ?? (activeCount === 2 ? 40 : 20)) : 0,
+  };
+
+  const computedMinSizes = {
+    left: minSizes?.left ?? 5,
+    middle: minSizes?.middle ?? 10,
+    right: minSizes?.right ?? 5,
+  };
+
+  // State for collapsed status - auto-collapse inactive panels
+  const [leftCollapsed, setLeftCollapsed] = useState(collapsed.left || !isLeftActive);
+  const [middleCollapsed, setMiddleCollapsed] = useState(collapsed.middle || !isMiddleActive);
+  const [rightCollapsed, setRightCollapsed] = useState(collapsed.right || !isRightActive);
 
   // State for animation
   const [leftAnimating, setLeftAnimating] = useState(false);
+  const [middleAnimating, setMiddleAnimating] = useState(false);
   const [rightAnimating, setRightAnimating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
   const leftFullyCollapsed = leftCollapsed && !leftAnimating;
+  const middleFullyCollapsed = middleCollapsed && !middleAnimating;
   const rightFullyCollapsed = rightCollapsed && !rightAnimating;
 
   // Helper to get panel content by ID
@@ -159,23 +191,28 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   const middlePanel = renderPanelSlot(layout.middle);
   const rightPanel = renderPanelSlot(layout.right);
 
-  // State for current sizes
-  const [leftSize, setLeftSize] = useState(collapsed.left ? 0 : defaultSizes.left);
-  const [rightSize, setRightSize] = useState(collapsed.right ? 0 : defaultSizes.right);
+  // State for current sizes - set to 0 for inactive or collapsed panels
+  const [leftSize, setLeftSize] = useState((collapsed.left || !isLeftActive) ? 0 : computedDefaultSizes.left);
+  const [middleSize, setMiddleSize] = useState((collapsed.middle || !isMiddleActive) ? 0 : computedDefaultSizes.middle);
+  const [rightSize, setRightSize] = useState((collapsed.right || !isRightActive) ? 0 : computedDefaultSizes.right);
 
   // State to preserve the last expanded size for collapsed panels
-  const [lastExpandedLeftSize, setLastExpandedLeftSize] = useState(defaultSizes.left);
-  const [lastExpandedRightSize, setLastExpandedRightSize] = useState(defaultSizes.right);
+  const [lastExpandedLeftSize, setLastExpandedLeftSize] = useState(computedDefaultSizes.left);
+  const [lastExpandedMiddleSize, setLastExpandedMiddleSize] = useState(computedDefaultSizes.middle);
+  const [lastExpandedRightSize, setLastExpandedRightSize] = useState(computedDefaultSizes.right);
 
   // Panel refs
   const panelGroupRef = useRef<ImperativePanelGroupHandle>(null);
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
+  const middlePanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
 
   // Animation refs
   const leftAnimationFrameRef = useRef<number | undefined>(undefined);
+  const middleAnimationFrameRef = useRef<number | undefined>(undefined);
   const rightAnimationFrameRef = useRef<number | undefined>(undefined);
   const leftStartTimeRef = useRef<number | undefined>(undefined);
+  const middleStartTimeRef = useRef<number | undefined>(undefined);
   const rightStartTimeRef = useRef<number | undefined>(undefined);
 
   // Generic animation function
@@ -296,7 +333,7 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
 
     leftAnimationFrameRef.current = requestAnimationFrame(() => {
       // Use the last expanded size to restore the panel to its previous size
-      const targetSize = lastExpandedLeftSize || defaultSizes.left;
+      const targetSize = lastExpandedLeftSize || computedDefaultSizes.left;
 
       animatePanel(
         leftPanelRef,
@@ -314,7 +351,7 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   }, [
     leftAnimating,
     isDragging,
-    defaultSizes.left,
+    computedDefaultSizes.left,
     lastExpandedLeftSize,
     collapsiblePanels.left,
     animatePanel,
@@ -379,7 +416,7 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
 
     rightAnimationFrameRef.current = requestAnimationFrame(() => {
       // Use the last expanded size to restore the panel to its previous size
-      const targetSize = lastExpandedRightSize || defaultSizes.right;
+      const targetSize = lastExpandedRightSize || computedDefaultSizes.right;
 
       animatePanel(
         rightPanelRef,
@@ -397,7 +434,7 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   }, [
     rightAnimating,
     isDragging,
-    defaultSizes.right,
+    computedDefaultSizes.right,
     lastExpandedRightSize,
     collapsiblePanels.right,
     animatePanel,
@@ -414,6 +451,96 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
     }
   }, [leftCollapsed, handleLeftCollapse, handleLeftExpand]);
 
+  // Middle panel collapse/expand handlers
+  const handleMiddleCollapse = useCallback(() => {
+    if (middleAnimating || isDragging || !collapsiblePanels.middle) return;
+
+    flushSync(() => {
+      setMiddleAnimating(true);
+      setMiddleCollapsed(true);
+    });
+    if (onMiddleCollapseStart) onMiddleCollapseStart();
+
+    if (middleAnimationFrameRef.current) {
+      cancelAnimationFrame(middleAnimationFrameRef.current);
+    }
+
+    middleAnimationFrameRef.current = requestAnimationFrame(() => {
+      const currentLayout = panelGroupRef.current?.getLayout();
+      const actualMiddleSize = Math.round((currentLayout?.[1] ?? middleSize) * 1000) / 1000;
+
+      animatePanel(
+        middlePanelRef,
+        actualMiddleSize,
+        0,
+        middleAnimationFrameRef,
+        middleStartTimeRef,
+        () => {
+          setMiddleSize(0);
+          setMiddleAnimating(false);
+          if (onMiddleCollapseComplete) onMiddleCollapseComplete();
+        }
+      );
+    });
+  }, [
+    middleAnimating,
+    isDragging,
+    middleSize,
+    collapsiblePanels.middle,
+    animatePanel,
+    onMiddleCollapseStart,
+    onMiddleCollapseComplete,
+  ]);
+
+  const handleMiddleExpand = useCallback(() => {
+    if (middleAnimating || isDragging || !collapsiblePanels.middle) return;
+
+    flushSync(() => {
+      setMiddleAnimating(true);
+      setMiddleCollapsed(false);
+    });
+    if (onMiddleExpandStart) onMiddleExpandStart();
+
+    if (middleAnimationFrameRef.current) {
+      cancelAnimationFrame(middleAnimationFrameRef.current);
+    }
+
+    middleAnimationFrameRef.current = requestAnimationFrame(() => {
+      const targetSize = lastExpandedMiddleSize || computedDefaultSizes.middle;
+
+      animatePanel(
+        middlePanelRef,
+        0,
+        targetSize,
+        middleAnimationFrameRef,
+        middleStartTimeRef,
+        () => {
+          setMiddleSize(targetSize);
+          setMiddleAnimating(false);
+          if (onMiddleExpandComplete) onMiddleExpandComplete();
+        }
+      );
+    });
+  }, [
+    middleAnimating,
+    isDragging,
+    computedDefaultSizes.middle,
+    lastExpandedMiddleSize,
+    collapsiblePanels.middle,
+    animatePanel,
+    onMiddleExpandStart,
+    onMiddleExpandComplete,
+  ]);
+
+  // Note: toggleMiddlePanel can be added if middle panel collapse buttons are needed
+  // const toggleMiddlePanel = useCallback(() => {
+  //   if (middleCollapsed) {
+  //     handleMiddleExpand();
+  //   } else {
+  //     handleMiddleCollapse();
+  //   }
+  // }, [middleCollapsed, handleMiddleCollapse, handleMiddleExpand]);
+
   const toggleRightPanel = useCallback(() => {
     if (rightCollapsed) {
       handleRightExpand();
@@ -424,7 +551,7 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
 
   // Resize handlers
   const handleLeftResize = useCallback((size: number) => {
-    if (!leftAnimating && !rightAnimating) {
+    if (!leftAnimating && !middleAnimating && !rightAnimating) {
       setLeftSize(size);
       // Track the last expanded size (only when > 0)
       if (size > 0) {
@@ -432,10 +559,21 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
         setLeftCollapsed(false);
       }
     }
-  }, [leftAnimating, rightAnimating]);
+  }, [leftAnimating, middleAnimating, rightAnimating]);
+
+  const handleMiddleResize = useCallback((size: number) => {
+    if (!leftAnimating && !middleAnimating && !rightAnimating) {
+      setMiddleSize(size);
+      // Track the last expanded size (only when > 0)
+      if (size > 0) {
+        setLastExpandedMiddleSize(size);
+        setMiddleCollapsed(false);
+      }
+    }
+  }, [leftAnimating, middleAnimating, rightAnimating]);
 
   const handleRightResize = useCallback((size: number) => {
-    if (!leftAnimating && !rightAnimating) {
+    if (!leftAnimating && !middleAnimating && !rightAnimating) {
       setRightSize(size);
       // Track the last expanded size (only when > 0)
       if (size > 0) {
@@ -443,22 +581,23 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
         setRightCollapsed(false);
       }
     }
-  }, [leftAnimating, rightAnimating]);
+  }, [leftAnimating, middleAnimating, rightAnimating]);
 
   // Drag handlers
   const handleDragEnd = useCallback(() => {
     if (onPanelResize) {
       // Use the last expanded size for collapsed panels to preserve their size
       const reportedLeftSize = leftCollapsed ? lastExpandedLeftSize : leftSize;
+      const reportedMiddleSize = middleCollapsed ? lastExpandedMiddleSize : middleSize;
       const reportedRightSize = rightCollapsed ? lastExpandedRightSize : rightSize;
 
       onPanelResize({
         left: reportedLeftSize,
-        middle: 100 - reportedLeftSize - reportedRightSize,
+        middle: reportedMiddleSize,
         right: reportedRightSize,
       });
     }
-  }, [leftSize, rightSize, leftCollapsed, rightCollapsed, lastExpandedLeftSize, lastExpandedRightSize, onPanelResize]);
+  }, [leftSize, middleSize, rightSize, leftCollapsed, middleCollapsed, rightCollapsed, lastExpandedLeftSize, lastExpandedMiddleSize, lastExpandedRightSize, onPanelResize]);
 
   const handleDragging = useCallback(
     (dragging: boolean) => {
@@ -485,6 +624,19 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   }, [collapsed.left, leftCollapsed, handleLeftCollapse, handleLeftExpand]);
 
   useEffect(() => {
+    if (collapsed.middle !== undefined && collapsed.middle !== middleCollapsed) {
+      // Defer to next tick to avoid flushSync warning
+      queueMicrotask(() => {
+        if (collapsed.middle) {
+          handleMiddleCollapse();
+        } else {
+          handleMiddleExpand();
+        }
+      });
+    }
+  }, [collapsed.middle, middleCollapsed, handleMiddleCollapse, handleMiddleExpand]);
+
+  useEffect(() => {
     if (collapsed.right !== undefined && collapsed.right !== rightCollapsed) {
       // Defer to next tick to avoid flushSync warning
       queueMicrotask(() => {
@@ -503,6 +655,9 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
       if (leftAnimationFrameRef.current) {
         cancelAnimationFrame(leftAnimationFrameRef.current);
       }
+      if (middleAnimationFrameRef.current) {
+        cancelAnimationFrame(middleAnimationFrameRef.current);
+      }
       if (rightAnimationFrameRef.current) {
         cancelAnimationFrame(rightAnimationFrameRef.current);
       }
@@ -513,16 +668,25 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   const getPanelClassName = (panelName: 'left' | 'middle' | 'right') => {
     let className = 'three-panel-item';
 
-    if (panelName === 'left' && collapsiblePanels.left) {
-      className += ' collapsible-panel';
-      if (leftAnimating && !isDragging) className += ' animating';
-      if (leftFullyCollapsed) className += ' collapsed';
-    } else if (panelName === 'right' && collapsiblePanels.right) {
-      className += ' collapsible-panel';
-      if (rightAnimating && !isDragging) className += ' animating';
-      if (rightFullyCollapsed) className += ' collapsed';
+    if (panelName === 'left') {
+      if (collapsiblePanels.left || !isLeftActive) {
+        className += ' collapsible-panel';
+        if (leftAnimating && !isDragging) className += ' animating';
+        if (leftFullyCollapsed) className += ' collapsed';
+      }
     } else if (panelName === 'middle') {
       className += ' middle-panel';
+      if (collapsiblePanels.middle || !isMiddleActive) {
+        className += ' collapsible-panel';
+        if (middleAnimating && !isDragging) className += ' animating';
+        if (middleFullyCollapsed) className += ' collapsed';
+      }
+    } else if (panelName === 'right') {
+      if (collapsiblePanels.right || !isRightActive) {
+        className += ' collapsible-panel';
+        if (rightAnimating && !isDragging) className += ' animating';
+        if (rightFullyCollapsed) className += ' collapsed';
+      }
     }
 
     return className;
@@ -532,7 +696,15 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
     leftAnimating && !isDragging
       ? ({
           transition: `width ${animationDuration}ms ${animationEasing}`,
-          width: leftCollapsed ? '0%' : `${defaultSizes.left}%`
+          width: leftCollapsed ? '0%' : `${computedDefaultSizes.left}%`
+        } satisfies React.CSSProperties)
+      : undefined;
+
+  const middleCollapsiblePanelStyle =
+    middleAnimating && !isDragging
+      ? ({
+          transition: `width ${animationDuration}ms ${animationEasing}`,
+          width: middleCollapsed ? '0%' : `${computedDefaultSizes.middle}%`
         } satisfies React.CSSProperties)
       : undefined;
 
@@ -540,15 +712,16 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
     rightAnimating && !isDragging
       ? ({
           transition: `width ${animationDuration}ms ${animationEasing}`,
-          width: rightCollapsed ? '0%' : `${defaultSizes.right}%`
+          width: rightCollapsed ? '0%' : `${computedDefaultSizes.right}%`
         } satisfies React.CSSProperties)
       : undefined;
 
   // Apply theme as CSS variables
   const themeStyles = mapThemeToPanelVars(theme) as React.CSSProperties;
 
-  const leftPanelMinSize = leftAnimating || rightAnimating ? 0 : minSizes.left;
-  const rightPanelMinSize = leftAnimating || rightAnimating ? 0 : minSizes.right;
+  const leftPanelMinSize = leftAnimating || middleAnimating || rightAnimating ? 0 : computedMinSizes.left;
+  const middlePanelMinSize = leftAnimating || middleAnimating || rightAnimating ? 0 : computedMinSizes.middle;
+  const rightPanelMinSize = leftAnimating || middleAnimating || rightAnimating ? 0 : computedMinSizes.right;
 
   return (
     <div className={`three-panel-layout ${className}`} style={{ ...themeStyles, ...style }}>
@@ -556,8 +729,8 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
         {/* Left Panel */}
         <Panel
           ref={leftPanelRef}
-          collapsible={collapsiblePanels.left}
-          defaultSize={collapsed.left ? 0 : defaultSizes.left}
+          collapsible={collapsiblePanels.left || !isLeftActive}
+          defaultSize={(collapsed.left || !isLeftActive) ? 0 : computedDefaultSizes.left}
           minSize={leftPanelMinSize}
           collapsedSize={0}
           onResize={handleLeftResize}
@@ -579,11 +752,11 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
           </div>
         </Panel>
 
-        {/* Left Resize Handle */}
+        {/* Left Resize Handle - between left and middle */}
         <PanelResizeHandle
-          className={`resize-handle left-handle ${leftFullyCollapsed ? 'collapsed' : ''}`}
+          className={`resize-handle left-handle ${leftFullyCollapsed || !isLeftActive || !isMiddleActive ? 'collapsed' : ''}`}
           onDragging={handleDragging}
-          disabled={leftFullyCollapsed}
+          disabled={leftFullyCollapsed || !isLeftActive || !isMiddleActive}
         >
           {showCollapseButtons && collapsiblePanels.left && (
             <div className="handle-bar">
@@ -601,20 +774,35 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
 
         {/* Middle Panel */}
         <Panel
-          defaultSize={defaultSizes.middle}
-          minSize={minSizes.middle}
+          ref={middlePanelRef}
+          collapsible={collapsiblePanels.middle || !isMiddleActive}
+          defaultSize={(collapsed.middle || !isMiddleActive) ? 0 : computedDefaultSizes.middle}
+          minSize={middlePanelMinSize}
+          collapsedSize={0}
+          onResize={handleMiddleResize}
+          onCollapse={() => setMiddleCollapsed(true)}
+          onExpand={() => setMiddleCollapsed(false)}
           className={getPanelClassName('middle')}
+          style={middleCollapsiblePanelStyle}
         >
-          <div className="panel-content-wrapper">
+          <div
+            className="panel-content-wrapper"
+            style={{
+              opacity: middleCollapsed ? 0 : 1,
+              transition: middleAnimating
+                ? `opacity ${animationDuration * 0.5}ms ${animationEasing}`
+                : 'none',
+            }}
+          >
             {middlePanel}
           </div>
         </Panel>
 
-        {/* Right Resize Handle */}
+        {/* Right Resize Handle - between middle and right, OR between left and right if middle is inactive */}
         <PanelResizeHandle
-          className={`resize-handle right-handle ${rightFullyCollapsed ? 'collapsed' : ''}`}
+          className={`resize-handle right-handle ${rightFullyCollapsed || !isRightActive || (!isMiddleActive && !isLeftActive) ? 'collapsed' : ''}`}
           onDragging={handleDragging}
-          disabled={rightFullyCollapsed}
+          disabled={rightFullyCollapsed || !isRightActive || (!isMiddleActive && !isLeftActive)}
         >
           {showCollapseButtons && collapsiblePanels.right && (
             <div className="handle-bar">
@@ -633,8 +821,8 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
         {/* Right Panel */}
         <Panel
           ref={rightPanelRef}
-          collapsible={collapsiblePanels.right}
-          defaultSize={collapsed.right ? 0 : defaultSizes.right}
+          collapsible={collapsiblePanels.right || !isRightActive}
+          defaultSize={(collapsed.right || !isRightActive) ? 0 : computedDefaultSizes.right}
           minSize={rightPanelMinSize}
           collapsedSize={0}
           onResize={handleRightResize}

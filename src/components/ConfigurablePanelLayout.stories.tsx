@@ -303,3 +303,89 @@ export const TabGroupBottomPosition: Story = {
     theme: slateTheme,
   },
 };
+
+// Two-Panel Layouts - Left + Right (skip middle)
+export const TwoPanelLeftRight: Story = {
+  args: {
+    panels: samplePanels,
+    layout: {
+      left: 'nav',
+      middle: null,
+      right: 'main',
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 30, middle: 0, right: 70 },
+    theme: slateTheme,
+  },
+};
+
+// Two-Panel Layouts - Left + Middle (skip right)
+export const TwoPanelLeftMiddle: Story = {
+  args: {
+    panels: samplePanels,
+    layout: {
+      left: 'nav',
+      middle: 'main',
+      right: null,
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 25, middle: 75, right: 0 },
+    theme: slateTheme,
+  },
+};
+
+// Two-Panel Layouts - Middle + Right (skip left)
+export const TwoPanelMiddleRight: Story = {
+  args: {
+    panels: samplePanels,
+    layout: {
+      left: null,
+      middle: 'main',
+      right: 'sidebar',
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 0, middle: 70, right: 30 },
+    theme: slateTheme,
+  },
+};
+
+// Enhanced Two-Panel - What the API should look like after implementation
+export const EnhancedTwoPanelAPI: Story = {
+  name: 'Enhanced Two-Panel API (Future)',
+  args: {
+    panels: [
+      {
+        id: 'content',
+        label: 'Content',
+        content: (
+          <div style={{ padding: '20px' }}>
+            <h2>Content Panel</h2>
+            <p>This demonstrates the simplified two-panel API.</p>
+            <p>Notice we only need to define two panels and two size values.</p>
+          </div>
+        ),
+      },
+      {
+        id: 'preview',
+        label: 'Preview',
+        content: (
+          <div style={{ padding: '20px' }}>
+            <h3>Preview Panel</h3>
+            <div style={{ border: '2px dashed #ccc', padding: '30px', borderRadius: '8px', textAlign: 'center' }}>
+              Preview Area
+            </div>
+          </div>
+        ),
+      },
+    ],
+    layout: {
+      left: 'content',
+      middle: null,
+      right: 'preview',
+    },
+    showCollapseButtons: true,
+    // Future API: should accept just { left: 60, right: 40 }
+    defaultSizes: { left: 60, middle: 0, right: 40 },
+    theme: slateTheme,
+  },
+};
