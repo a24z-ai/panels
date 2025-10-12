@@ -89,7 +89,7 @@ export const AnimatedResizableLayout: React.FC<AnimatedResizableLayoutProps> = (
   const panelRef = useRef<ImperativePanelHandle>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const startTimeRef = useRef<number | undefined>(undefined);
-  const animationTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Smooth animation using requestAnimationFrame
   const animatePanel = useCallback(
