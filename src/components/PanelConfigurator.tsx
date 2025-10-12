@@ -21,9 +21,13 @@ export interface PanelGroup {
 }
 
 export interface TabsConfig {
-  defaultActiveTab?: number;        // Which tab is active by default (index)
+  defaultActiveTab?: number;        // Which tab is active by default (index) - for uncontrolled mode
   tabPosition?: 'top' | 'bottom' | 'left' | 'right';
   centered?: boolean;                // Whether to center the tabs
+
+  // Controlled mode props
+  activeTabIndex?: number;           // Controlled active tab index
+  onTabChange?: (index: number) => void; // Callback when tab changes
 }
 
 export interface TilesConfig {

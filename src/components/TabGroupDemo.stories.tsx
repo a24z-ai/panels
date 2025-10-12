@@ -226,3 +226,94 @@ export const IDELayout: Story = {
     </ThemeProvider>
   ),
 };
+
+// Controlled mode example - demonstrating programmatic tab switching
+const ControlledTabDemo = () => {
+  const [activeTab, setActiveTab] = useState(0);
+  const [layout, setLayout] = useState<PanelLayout>({
+    left: null,
+    middle: 'main',
+    right: {
+      type: 'tabs',
+      panels: ['console', 'terminal', 'output'],
+      config: {
+        tabPosition: 'top',
+        activeTabIndex: activeTab,
+        onTabChange: setActiveTab,
+      }
+    },
+  });
+
+  // Sync activeTabIndex with state
+  React.useEffect(() => {
+    setLayout(prev => ({
+      ...prev,
+      right: {
+        type: 'tabs',
+        panels: ['console', 'terminal', 'output'],
+        config: {
+          tabPosition: 'top',
+          activeTabIndex: activeTab,
+          onTabChange: setActiveTab,
+        }
+      }
+    }));
+  }, [activeTab]);
+
+  const tabNames = ['Console', 'Terminal', 'Output'];
+
+  return (
+    <ThemeProvider theme={terminalTheme}>
+      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+        {/* Control Panel */}
+        <div style={{
+          padding: '1rem',
+          background: '#2a2a2a',
+          color: '#fff',
+        }}>
+          <h2 style={{ margin: '0 0 1rem 0' }}>Controlled Tab Mode Demo</h2>
+          <p style={{ margin: '0 0 1rem 0', opacity: 0.8 }}>
+            Programmatically control active tab using buttons
+          </p>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {tabNames.map((name, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveTab(index)}
+                style={{
+                  padding: '8px 16px',
+                  background: activeTab === index ? '#00ff00' : '#555',
+                  color: activeTab === index ? '#000' : '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: activeTab === index ? 'bold' : 'normal',
+                }}
+              >
+                Focus {name}
+              </button>
+            ))}
+          </div>
+          <p style={{ margin: '1rem 0 0 0', fontSize: '0.9rem', opacity: 0.7 }}>
+            Current active tab: <strong>{tabNames[activeTab]}</strong>
+          </p>
+        </div>
+
+        {/* Layout */}
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <ConfigurablePanelLayout
+            panels={demopanels}
+            layout={layout}
+            showCollapseButtons={true}
+            defaultSizes={{ left: 0, middle: 40, right: 60 }}
+            theme={terminalTheme}
+          />
+        </div>
+      </div>
+    </ThemeProvider>
+  );
+};
+
+export const ControlledMode: Story = {
+  render: () => <ControlledTabDemo />,
+};

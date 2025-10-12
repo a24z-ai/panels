@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Theme } from '@a24z/industry-theme';
 import { mapThemeToTabVars } from '../utils/themeMapping';
 import { PanelDefinitionWithContent } from './ConfigurablePanelLayout';
@@ -32,8 +32,37 @@ export const TabGroup: React.FC<TabGroupProps> = ({
   className = '',
   theme,
 }) => {
-  const { defaultActiveTab = 0, tabPosition = 'top', centered = true } = config;
-  const [activeTabIndex, setActiveTabIndex] = useState(defaultActiveTab);
+  const {
+    defaultActiveTab = 0,
+    tabPosition = 'top',
+    centered = true,
+    activeTabIndex: controlledIndex,
+    onTabChange,
+  } = config;
+
+  // Internal state for uncontrolled mode
+  const [internalIndex, setInternalIndex] = useState(defaultActiveTab);
+
+  // Determine if component is controlled
+  const isControlled = controlledIndex !== undefined;
+
+  // Use controlled value if provided, otherwise use internal state
+  const activeTabIndex = isControlled ? controlledIndex : internalIndex;
+
+  // Handle tab changes
+  const handleTabClick = (index: number) => {
+    if (!isControlled) {
+      setInternalIndex(index);
+    }
+    onTabChange?.(index);
+  };
+
+  // Sync internal state when defaultActiveTab changes (for uncontrolled mode)
+  useEffect(() => {
+    if (!isControlled) {
+      setInternalIndex(defaultActiveTab);
+    }
+  }, [defaultActiveTab, isControlled]);
 
   // Apply theme as CSS variables
   const themeStyles = mapThemeToTabVars(theme) as React.CSSProperties;
@@ -65,7 +94,7 @@ export const TabGroup: React.FC<TabGroupProps> = ({
           aria-controls={`tabpanel-${panel.id}`}
           id={`tab-${panel.id}`}
           className={`tab-button ${index === safeActiveIndex ? 'active' : ''}`}
-          onClick={() => setActiveTabIndex(index)}
+          onClick={() => handleTabClick(index)}
           title={panel.icon ? panel.label : undefined}
         >
           {panel.icon ? (
