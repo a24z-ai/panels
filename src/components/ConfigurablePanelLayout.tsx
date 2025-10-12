@@ -25,24 +25,24 @@ export interface ConfigurablePanelLayoutProps {
   /** Available panels with their content */
   panels: PanelDefinitionWithContent[];
 
-  /** Current layout configuration */
+  /** Current layout configuration - omit or set positions to null/undefined for two-panel layouts */
   layout: PanelLayout;
 
-  /** Which panels are collapsible */
+  /** Which panels are collapsible - only specify for active panels */
   collapsiblePanels?: {
     left?: boolean;
     middle?: boolean;
     right?: boolean;
   };
 
-  /** Default sizes for each panel (0-100, must sum to 100) */
+  /** Default sizes for each panel (0-100, should sum to 100 for active panels) - only specify for active panels */
   defaultSizes?: {
     left?: number;
     middle?: number;
     right?: number;
   };
 
-  /** Minimum sizes for each panel when expanded (0-100) */
+  /** Minimum sizes for each panel when expanded (0-100) - only specify for active panels */
   minSizes?: {
     left?: number;
     middle?: number;
@@ -91,7 +91,13 @@ export interface ConfigurablePanelLayoutProps {
 }
 
 /**
- * ConfigurablePanelLayout - A three-panel layout that works with PanelConfigurator
+ * ConfigurablePanelLayout - A flexible panel layout that supports 2 or 3 panels
+ *
+ * Supports both two-panel and three-panel layouts:
+ * - For two panels: omit or set unused positions to null/undefined (e.g., { left: 'panel1', right: 'panel2' })
+ * - For three panels: define all positions (e.g., { left: 'panel1', middle: 'panel2', right: 'panel3' })
+ *
+ * The component automatically adjusts sizing and behavior based on active panels.
  */
 export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = ({
   panels,
@@ -121,16 +127,22 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   onPanelResize,
 }) => {
   // Auto-detect which panels are active (have content)
-  const isLeftActive = layout.left !== null;
-  const isMiddleActive = layout.middle !== null;
-  const isRightActive = layout.right !== null;
+  // Support both undefined and null for inactive panels
+  const isLeftActive = layout.left !== null && layout.left !== undefined;
+  const isMiddleActive = layout.middle !== null && layout.middle !== undefined;
+  const isRightActive = layout.right !== null && layout.right !== undefined;
 
   // Compute smart defaults based on active panels
   const activeCount = [isLeftActive, isMiddleActive, isRightActive].filter(Boolean).length;
+
+  // Smart defaults:
+  // - Two panels: 50/50 split by default
+  // - Three panels: 20/60/20 split by default
+  // - One panel: 100%
   const computedDefaultSizes = {
-    left: isLeftActive ? (defaultSizes?.left ?? (activeCount === 2 ? 40 : 20)) : 0,
-    middle: isMiddleActive ? (defaultSizes?.middle ?? (activeCount === 2 ? 60 : 60)) : 0,
-    right: isRightActive ? (defaultSizes?.right ?? (activeCount === 2 ? 40 : 20)) : 0,
+    left: isLeftActive ? (defaultSizes?.left ?? (activeCount === 2 ? 50 : activeCount === 3 ? 20 : 100)) : 0,
+    middle: isMiddleActive ? (defaultSizes?.middle ?? (activeCount === 2 ? 50 : activeCount === 3 ? 60 : 100)) : 0,
+    right: isRightActive ? (defaultSizes?.right ?? (activeCount === 2 ? 50 : activeCount === 3 ? 20 : 100)) : 0,
   };
 
   const computedMinSizes = {
@@ -187,9 +199,9 @@ export const ConfigurablePanelLayout: React.FC<ConfigurablePanelLayoutProps> = (
   }, [panels, getPanelContent, theme]);
 
   // Get actual panel content from layout
-  const leftPanel = renderPanelSlot(layout.left);
-  const middlePanel = renderPanelSlot(layout.middle);
-  const rightPanel = renderPanelSlot(layout.right);
+  const leftPanel = renderPanelSlot(layout.left ?? null);
+  const middlePanel = renderPanelSlot(layout.middle ?? null);
+  const rightPanel = renderPanelSlot(layout.right ?? null);
 
   // State for current sizes - set to 0 for inactive or collapsed panels
   const [leftSize, setLeftSize] = useState((collapsed.left || !isLeftActive) ? 0 : computedDefaultSizes.left);

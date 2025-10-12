@@ -38,9 +38,9 @@ export interface TilesConfig {
 }
 
 export interface PanelLayout {
-  left: PanelSlot;
-  middle: PanelSlot;
-  right: PanelSlot;
+  left?: PanelSlot;
+  middle?: PanelSlot;
+  right?: PanelSlot;
 }
 
 export interface PanelConfiguratorProps {
@@ -64,13 +64,13 @@ type SlotPosition = 'left' | 'middle' | 'right';
 type Selection = { type: 'slot'; position: SlotPosition } | { type: 'panel'; id: string } | null;
 
 // Helper to check if a slot is a group
-const isGroup = (slot: PanelSlot): slot is PanelGroup => {
-  return slot !== null && typeof slot === 'object' && 'type' in slot;
+const isGroup = (slot: PanelSlot | undefined): slot is PanelGroup => {
+  return slot !== null && slot !== undefined && typeof slot === 'object' && 'type' in slot;
 };
 
 // Helper to get panel IDs from a slot
-const getPanelIdsFromSlot = (slot: PanelSlot): string[] => {
-  if (slot === null) return [];
+const getPanelIdsFromSlot = (slot: PanelSlot | undefined): string[] => {
+  if (slot === null || slot === undefined) return [];
   if (typeof slot === 'string') return [slot];
   if (isGroup(slot)) return slot.panels;
   return [];
@@ -121,7 +121,7 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
       const slot = newLayout[pos];
       if (slot === panelId) {
         newLayout[pos] = null;
-      } else if (isGroup(slot)) {
+      } else if (slot !== null && slot !== undefined && isGroup(slot)) {
         const filteredPanels = slot.panels.filter(id => id !== panelId);
         if (filteredPanels.length === 0) {
           newLayout[pos] = null;
@@ -444,14 +444,14 @@ export const PanelConfigurator: React.FC<PanelConfiguratorProps> = ({
                   </div>
                 ) : (
                   <div className="slot-content">
-                    {getPanelById(slot)?.preview && (
+                    {typeof slot === 'string' && getPanelById(slot)?.preview && (
                       <div className="slot-preview">{getPanelById(slot)?.preview}</div>
                     )}
-                    <div className="slot-panel-label">{getPanelById(slot)?.label}</div>
+                    <div className="slot-panel-label">{typeof slot === 'string' ? getPanelById(slot)?.label : ''}</div>
                     <button
                       className="slot-clear-btn"
                       onClick={(e) => handleSlotClear(position, e)}
-                      aria-label={`Remove ${getPanelById(slot)?.label} from ${position} slot`}
+                      aria-label={`Remove ${typeof slot === 'string' ? getPanelById(slot)?.label : 'panel'} from ${position} slot`}
                     >
                       ×
                     </button>

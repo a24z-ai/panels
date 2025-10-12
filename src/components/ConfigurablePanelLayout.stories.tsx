@@ -349,9 +349,9 @@ export const TwoPanelMiddleRight: Story = {
   },
 };
 
-// Enhanced Two-Panel - What the API should look like after implementation
+// Enhanced Two-Panel - Cleaner API without needing to specify middle
 export const EnhancedTwoPanelAPI: Story = {
-  name: 'Enhanced Two-Panel API (Future)',
+  name: 'Enhanced Two-Panel API',
   args: {
     panels: [
       {
@@ -362,6 +362,7 @@ export const EnhancedTwoPanelAPI: Story = {
             <h2>Content Panel</h2>
             <p>This demonstrates the simplified two-panel API.</p>
             <p>Notice we only need to define two panels and two size values.</p>
+            <p><strong>No need to set middle to null or define unused positions!</strong></p>
           </div>
         ),
       },
@@ -378,14 +379,60 @@ export const EnhancedTwoPanelAPI: Story = {
         ),
       },
     ],
+    // Clean API: just omit middle entirely!
     layout: {
       left: 'content',
-      middle: null,
       right: 'preview',
     },
     showCollapseButtons: true,
-    // Future API: should accept just { left: 60, right: 40 }
-    defaultSizes: { left: 60, middle: 0, right: 40 },
+    // Only specify sizes for active panels (automatically defaults to 50/50)
+    defaultSizes: { left: 60, right: 40 },
+    theme: slateTheme,
+  },
+};
+
+// Clean two-panel layout examples
+export const CleanTwoPanelLeftRight: Story = {
+  name: 'Clean Two-Panel: Left + Right',
+  args: {
+    panels: samplePanels,
+    layout: {
+      left: 'nav',
+      right: 'main',
+      // middle is omitted entirely
+    },
+    showCollapseButtons: true,
+    // Auto 50/50 split - no need to specify!
+    theme: slateTheme,
+  },
+};
+
+export const CleanTwoPanelLeftMiddle: Story = {
+  name: 'Clean Two-Panel: Left + Middle',
+  args: {
+    panels: samplePanels,
+    layout: {
+      left: 'nav',
+      middle: 'main',
+      // right is omitted entirely
+    },
+    showCollapseButtons: true,
+    defaultSizes: { left: 30, middle: 70 },
+    theme: slateTheme,
+  },
+};
+
+export const CleanTwoPanelMiddleRight: Story = {
+  name: 'Clean Two-Panel: Middle + Right',
+  args: {
+    panels: samplePanels,
+    layout: {
+      // left is omitted entirely
+      middle: 'main',
+      right: 'sidebar',
+    },
+    showCollapseButtons: true,
+    defaultSizes: { middle: 75, right: 25 },
     theme: slateTheme,
   },
 };
