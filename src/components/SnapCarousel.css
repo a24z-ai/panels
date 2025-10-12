@@ -6,11 +6,15 @@
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  gap: var(--snap-carousel-gap, 16px);
+  gap: var(--snap-carousel-gap, 0px);
   padding: 0;
   width: 100%;
   height: 100%;
   background-color: var(--panel-background);
+  box-sizing: border-box;
+
+  /* Enable container queries */
+  container-type: inline-size;
 
   /* Hide scrollbar but keep functionality */
   -ms-overflow-style: none;  /* IE and Edge */
@@ -27,9 +31,12 @@
   scroll-snap-align: start;
   scroll-snap-stop: always;
 
-  /* Panel sizing: use max of minimum width or ideal viewport width */
-  width: max(var(--snap-carousel-min-width, 500px), var(--snap-carousel-ideal-width, 33.333vw));
+  /* Panel sizing: Use dynamic width based on panel count */
+  width: var(--snap-carousel-panel-width, 33.33vw);
   height: 100%;
+
+  /* Ensure borders don't add to width */
+  box-sizing: border-box;
 
   /* Panel styling */
   background-color: var(--panel-background);
@@ -40,6 +47,8 @@
   /* Smooth transitions */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+/* Note: 2-panel layout responsive behavior is handled via dynamic inline styles in the component */
 
 /* Hover effect for panels */
 .snap-carousel-panel:hover {
@@ -52,23 +61,17 @@
   transform: translateY(0);
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments for mobile */
 @media (max-width: 768px) {
   .snap-carousel-container {
     /* Reduce padding on mobile */
     padding: 0 8px;
   }
-
-  .snap-carousel-panel {
-    /* On mobile, panels should be closer to full width */
-    width: max(var(--snap-carousel-min-width, 500px), 85vw);
-  }
 }
 
 @media (max-width: 540px) {
   .snap-carousel-panel {
-    /* On very small screens, allow panels to be smaller than min-width */
-    width: calc(100vw - 32px);
+    /* On very small screens, ensure panels fit nicely */
     min-width: 280px;
   }
 }

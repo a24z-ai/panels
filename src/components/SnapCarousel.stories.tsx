@@ -17,8 +17,8 @@ const meta = {
     idealPanelWidth: {
       control: { type: 'number', min: 0.2, max: 0.8, step: 0.05 },
     },
-    gap: {
-      control: { type: 'number', min: 0, max: 48, step: 4 },
+    showSeparator: {
+      control: { type: 'boolean' },
     },
   },
 } satisfies Meta<typeof SnapCarousel>;
@@ -39,6 +39,7 @@ const createSamplePanel = (index: number, color: string) => (
       background: `linear-gradient(135deg, ${color}22, ${color}44)`,
       padding: '2rem',
       gap: '1rem',
+      boxSizing: 'border-box', // Ensure padding doesn't add to width
     }}
   >
     <h2 style={{ margin: 0, fontSize: '2rem' }}>Panel {index + 1}</h2>
@@ -60,9 +61,9 @@ export const Default: Story = {
       createSamplePanel(4, '#10b981'),
       createSamplePanel(5, '#06b6d4'),
     ],
-    minPanelWidth: 500,
+    minPanelWidth: 350,
     idealPanelWidth: 0.333,
-    gap: 16,
+    showSeparator: false,
   },
   decorators: [
     (Story) => (
@@ -84,7 +85,7 @@ export const ManyPanels: Story = {
     }),
     minPanelWidth: 500,
     idealPanelWidth: 0.333,
-    gap: 16,
+    showSeparator: false,
   },
   decorators: [
     (Story) => (
@@ -108,7 +109,7 @@ export const LargerPanels: Story = {
     ],
     minPanelWidth: 700,
     idealPanelWidth: 0.5,
-    gap: 24,
+    showSeparator: false,
   },
   decorators: [
     (Story) => (
@@ -121,7 +122,7 @@ export const LargerPanels: Story = {
   ],
 };
 
-export const NarrowGap: Story = {
+export const WithSeparator: Story = {
   args: {
     theme: terminalTheme,
     panels: [
@@ -133,7 +134,7 @@ export const NarrowGap: Story = {
     ],
     minPanelWidth: 500,
     idealPanelWidth: 0.333,
-    gap: 4,
+    showSeparator: true,
   },
   decorators: [
     (Story) => (
@@ -158,7 +159,7 @@ export const WithCallbacks: Story = {
     ],
     minPanelWidth: 500,
     idealPanelWidth: 0.333,
-    gap: 16,
+    showSeparator: false,
     onPanelChange: (index: number) => {
       console.log('Current panel:', index);
     },
@@ -178,7 +179,7 @@ export const CustomContent: Story = {
   args: {
     theme: terminalTheme,
     panels: [
-      <div key="card-1" style={{ padding: '2rem', height: '100%', overflow: 'auto' }}>
+      <div key="card-1" style={{ padding: '2rem', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
         <h3>Product Card</h3>
         <img
           src="https://via.placeholder.com/400x300"
@@ -189,7 +190,7 @@ export const CustomContent: Story = {
         <p>This is a detailed description of the product with all its features and benefits.</p>
         <button style={{ padding: '0.5rem 1rem', borderRadius: '4px' }}>Add to Cart</button>
       </div>,
-      <div key="card-2" style={{ padding: '2rem', height: '100%', overflow: 'auto' }}>
+      <div key="card-2" style={{ padding: '2rem', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
         <h3>Statistics Dashboard</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ padding: '1rem', background: '#f0f0f0', borderRadius: '8px' }}>
@@ -206,7 +207,7 @@ export const CustomContent: Story = {
           </div>
         </div>
       </div>,
-      <div key="card-3" style={{ padding: '2rem', height: '100%', overflow: 'auto' }}>
+      <div key="card-3" style={{ padding: '2rem', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
         <h3>Article Preview</h3>
         <p style={{ fontSize: '0.875rem', opacity: 0.6 }}>Published on Jan 15, 2025</p>
         <h4>The Future of Web Development</h4>
@@ -222,7 +223,7 @@ export const CustomContent: Story = {
     ],
     minPanelWidth: 500,
     idealPanelWidth: 0.333,
-    gap: 16,
+    showSeparator: false,
   },
   decorators: [
     (Story) => (
@@ -360,6 +361,192 @@ export const WithNavigationButtons: Story = {
     theme: terminalTheme,
     minPanelWidth: 500,
     idealPanelWidth: 0.333,
-    gap: 1,
+    showSeparator: true,
+  },
+};
+
+const InteractivePanelTestComponent = () => {
+  const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#ef4444', '#f97316'];
+  const [panelCount, setPanelCount] = useState(1);
+  const [minPanelWidth, setMinPanelWidth] = useState(350);
+
+  const panels = Array.from({ length: panelCount }, (_, i) => createSamplePanel(i, colors[i % colors.length]));
+  const twoPanelThreshold = minPanelWidth * 2;
+
+  const addPanel = () => {
+    if (panelCount < 8) {
+      setPanelCount(panelCount + 1);
+    }
+  };
+
+  const removePanel = () => {
+    if (panelCount > 1) {
+      setPanelCount(panelCount - 1);
+    }
+  };
+
+  const setSpecificCount = (count: number) => {
+    setPanelCount(count);
+  };
+
+  return (
+    <ThemeProvider theme={terminalTheme}>
+      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+        {/* Control Panel */}
+        <div
+          style={{
+            padding: '1.5rem',
+            background: '#f5f5f5',
+            borderBottom: '2px solid #ddd',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <h3 style={{ margin: 0, fontSize: '1.25rem' }}>Test Responsive Panel Widths</h3>
+            <div
+              style={{
+                marginLeft: 'auto',
+                padding: '0.5rem 1rem',
+                background: '#3b82f6',
+                color: 'white',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+              }}
+            >
+              {panelCount} Panel{panelCount !== 1 ? 's' : ''}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                onClick={removePanel}
+                disabled={panelCount <= 1}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  background: panelCount <= 1 ? '#d1d5db' : '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: panelCount <= 1 ? 'not-allowed' : 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                }}
+              >
+                Remove Panel
+              </button>
+              <button
+                onClick={addPanel}
+                disabled={panelCount >= 8}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  background: panelCount >= 8 ? '#d1d5db' : '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: panelCount >= 8 ? 'not-allowed' : 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                }}
+              >
+                Add Panel
+              </button>
+            </div>
+
+            <div style={{ height: '32px', width: '2px', background: '#ddd' }} />
+
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#666' }}>Quick Set:</span>
+              {[1, 2, 3, 4, 5, 6].map((count) => (
+                <button
+                  key={count}
+                  onClick={() => setSpecificCount(count)}
+                  style={{
+                    padding: '0.5rem 0.875rem',
+                    background: panelCount === count ? '#8b5cf6' : '#e5e7eb',
+                    color: panelCount === count ? 'white' : '#374151',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: panelCount === count ? 'bold' : 'normal',
+                    transition: 'all 0.2s',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {count}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+              <span style={{ fontWeight: 'bold' }}>Min Panel Width:</span>
+              <input
+                type="number"
+                value={minPanelWidth}
+                onChange={(e) => setMinPanelWidth(Number(e.target.value))}
+                min="200"
+                max="800"
+                step="50"
+                style={{
+                  padding: '0.5rem',
+                  border: '2px solid #d1d5db',
+                  borderRadius: '4px',
+                  width: '100px',
+                  fontSize: '0.875rem',
+                }}
+              />
+              <span style={{ color: '#666' }}>px</span>
+            </label>
+            <div
+              style={{
+                padding: '0.5rem 1rem',
+                background: '#fef3c7',
+                borderRadius: '4px',
+                fontSize: '0.875rem',
+                fontWeight: 'bold',
+                color: '#92400e',
+              }}
+            >
+              2-Panel Threshold: {twoPanelThreshold}px
+            </div>
+          </div>
+
+          <div
+            style={{
+              padding: '1rem',
+              background: '#e0f2fe',
+              borderRadius: '6px',
+              border: '1px solid #0ea5e9',
+            }}
+          >
+            <div style={{ fontSize: '0.875rem', color: '#0c4a6e' }}>
+              <strong>Expected behavior:</strong>
+              <ul style={{ margin: '0.5rem 0 0 1.25rem', paddingLeft: 0 }}>
+                <li><strong>1 panel:</strong> 100% width</li>
+                <li><strong>2 panels:</strong> 100% width (50% when container &gt; {twoPanelThreshold}px)</li>
+                <li><strong>3+ panels:</strong> 33.33% of viewport width</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Carousel */}
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <SnapCarousel theme={terminalTheme} panels={panels} showSeparator={false} minPanelWidth={minPanelWidth} />
+        </div>
+      </div>
+    </ThemeProvider>
+  );
+};
+
+export const InteractivePanelTest: Story = {
+  render: InteractivePanelTestComponent,
+  args: {},
+  parameters: {
+    layout: 'fullscreen',
   },
 };

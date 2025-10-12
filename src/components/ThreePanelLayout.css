@@ -7,6 +7,7 @@
   flex-direction: column;
   position: relative;
   background-color: var(--panel-background);
+  box-sizing: border-box;
 }
 
 .three-panel-item {
@@ -15,6 +16,7 @@
   overflow: hidden;
   position: relative;
   background-color: var(--panel-background);
+  box-sizing: border-box;
 }
 
 .three-panel-item.collapsible-panel {
@@ -39,6 +41,7 @@
   flex: 1;
   overflow: auto;
   will-change: opacity;
+  box-sizing: border-box;
 }
 
 /* Resize Handle Styles */

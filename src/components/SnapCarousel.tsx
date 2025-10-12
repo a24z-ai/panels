@@ -23,14 +23,14 @@ export interface SnapCarouselProps {
   /** Theme object for customizing colors */
   theme: Theme;
 
-  /** Minimum width for each panel (default: 500px) */
+  /** Minimum width for each panel (default: 350px). For 2-panel layouts, the threshold for switching to 50% width is 2x this value. */
   minPanelWidth?: number;
 
   /** Ideal width for each panel as a fraction of viewport width (default: 1/3 = 0.333) */
   idealPanelWidth?: number;
 
-  /** Gap between panels in pixels (default: 1) */
-  gap?: number;
+  /** Whether to show a 1px separator between panels (default: false) */
+  showSeparator?: boolean;
 
   /** Callback when a panel comes into view */
   onPanelChange?: (index: number) => void;
@@ -38,16 +38,20 @@ export interface SnapCarouselProps {
 
 /**
  * SnapCarousel - A horizontally scrolling carousel with snap points
- * Each panel fills approximately 1/3 of the viewport width with a minimum of 500px
+ *
+ * Responsive behavior:
+ * - 1 panel: 100% width
+ * - 2 panels: 100% width by default, switches to 50% when container width > 2x minPanelWidth (default: 700px)
+ * - 3+ panels: 33.33% of viewport width
  */
 export const SnapCarousel = forwardRef<SnapCarouselRef, SnapCarouselProps>(({
   panels,
   className = '',
   style,
   theme,
-  minPanelWidth = 500,
+  minPanelWidth = 350,
   idealPanelWidth = 0.333, // 1/3 of viewport
-  gap = 1,
+  showSeparator = false,
   onPanelChange,
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -131,25 +135,70 @@ export const SnapCarousel = forwardRef<SnapCarouselRef, SnapCarouselProps>(({
     onPanelChange(closestIndex);
   };
 
+  // Calculate panel count for responsive sizing
+  const panelCount = panels.length;
+
+  // Calculate threshold for 2-panel layout: 2x minPanelWidth
+  const twoPanelThreshold = minPanelWidth * 2;
+
+  // Set panel width based on count
+  let panelWidth: string;
+  if (panelCount === 1) {
+    panelWidth = '100%';
+  } else if (panelCount === 2) {
+    // For 2 panels, use 50% if parent > threshold, else 100%
+    // We'll use container queries in CSS for this
+    panelWidth = '100%'; // Default, CSS container query will override
+  } else {
+    // 3+ panels use percentage of container, respecting minPanelWidth
+    // Use max() to ensure panels don't get smaller than minPanelWidth
+    panelWidth = `max(${minPanelWidth}px, ${idealPanelWidth * 100}%)`;
+  }
+
+  // Generate unique ID for this carousel instance to scope the dynamic styles
+  const carouselId = React.useId().replace(/:/g, '_');
+
   return (
-    <div
-      ref={containerRef}
-      className={`snap-carousel-container ${className}`}
-      style={{
-        ...themeStyles,
-        ...style,
-        '--snap-carousel-min-width': `${minPanelWidth}px`,
-        '--snap-carousel-ideal-width': `${idealPanelWidth * 100}vw`,
-        '--snap-carousel-gap': `${gap}px`,
-      } as React.CSSProperties}
-      onScroll={handleScroll}
-    >
-      {panels.map((panel, index) => (
-        <div key={index} className="snap-carousel-panel">
-          {panel}
-        </div>
-      ))}
-    </div>
+    <>
+      {/* Dynamic styles for 2-panel threshold */}
+      {panelCount === 2 && (
+        <style>
+          {`
+            .snap-carousel-container[data-carousel-id="${carouselId}"][data-panel-count="2"] .snap-carousel-panel {
+              width: 100%;
+            }
+            @container (min-width: ${twoPanelThreshold}px) {
+              .snap-carousel-container[data-carousel-id="${carouselId}"][data-panel-count="2"] .snap-carousel-panel {
+                width: 50%;
+              }
+            }
+          `}
+        </style>
+      )}
+      <div
+        ref={containerRef}
+        className={`snap-carousel-container ${className}`}
+        style={{
+          ...themeStyles,
+          ...style,
+          '--snap-carousel-min-width': `${minPanelWidth}px`,
+          '--snap-carousel-ideal-width': `${idealPanelWidth * 100}vw`,
+          '--snap-carousel-gap': showSeparator ? '1px' : '0px',
+          '--snap-carousel-panel-width': panelWidth,
+          '--snap-carousel-panel-count': panelCount,
+          '--snap-carousel-two-panel-threshold': `${twoPanelThreshold}px`,
+        } as React.CSSProperties}
+        onScroll={handleScroll}
+        data-panel-count={panelCount}
+        data-carousel-id={carouselId}
+      >
+        {panels.map((panel, index) => (
+          <div key={index} className="snap-carousel-panel">
+            {panel}
+          </div>
+        ))}
+      </div>
+    </>
   );
 });
 
