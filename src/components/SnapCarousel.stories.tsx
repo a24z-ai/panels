@@ -550,3 +550,122 @@ export const InteractivePanelTest: Story = {
     layout: 'fullscreen',
   },
 };
+
+// Interactive content panels to test preventKeyboardScroll
+const createInteractivePanel = (index: number, color: string) => (
+  <div
+    style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: `linear-gradient(135deg, ${color}22, ${color}44)`,
+      padding: '2rem',
+      gap: '1rem',
+      boxSizing: 'border-box',
+    }}
+  >
+    <h2 style={{ margin: 0, fontSize: '2rem' }}>Panel {index + 1}</h2>
+    <p style={{ margin: 0, textAlign: 'center', opacity: 0.8 }}>
+      Try pressing Space in the inputs below. With preventKeyboardScroll enabled,
+      the carousel won't scroll!
+    </p>
+    <input
+      type="text"
+      placeholder="Type here and press Space..."
+      style={{
+        width: '80%',
+        padding: '0.75rem',
+        fontSize: '1rem',
+        border: '2px solid #ccc',
+        borderRadius: '4px',
+      }}
+    />
+    <textarea
+      placeholder="Or type in this textarea..."
+      rows={4}
+      style={{
+        width: '80%',
+        padding: '0.75rem',
+        fontSize: '1rem',
+        border: '2px solid #ccc',
+        borderRadius: '4px',
+        resize: 'vertical',
+      }}
+    />
+  </div>
+);
+
+export const WithInteractiveContent: Story = {
+  args: {
+    theme: terminalTheme,
+    panels: [
+      createInteractivePanel(0, '#3b82f6'),
+      createInteractivePanel(1, '#8b5cf6'),
+      createInteractivePanel(2, '#ec4899'),
+      createInteractivePanel(3, '#10b981'),
+    ],
+    minPanelWidth: 500,
+    idealPanelWidth: 0.333,
+    showSeparator: true,
+    // preventKeyboardScroll: true is the default now
+  },
+  decorators: [
+    (Story) => (
+      <ThemeProvider theme={terminalTheme}>
+        <div style={{ height: '600px', width: '100%' }}>
+          <div style={{
+            padding: '1rem',
+            background: '#fef3c7',
+            borderBottom: '2px solid #f59e0b',
+            fontSize: '0.875rem',
+            fontWeight: 'bold',
+          }}>
+            ✨ preventKeyboardScroll is ENABLED by default - Space bar won't scroll the carousel
+          </div>
+          <div style={{ height: 'calc(100% - 50px)' }}>
+            <Story />
+          </div>
+        </div>
+      </ThemeProvider>
+    ),
+  ],
+};
+
+export const WithInteractiveContentDisabled: Story = {
+  args: {
+    theme: terminalTheme,
+    panels: [
+      createInteractivePanel(0, '#3b82f6'),
+      createInteractivePanel(1, '#8b5cf6'),
+      createInteractivePanel(2, '#ec4899'),
+      createInteractivePanel(3, '#10b981'),
+    ],
+    minPanelWidth: 500,
+    idealPanelWidth: 0.333,
+    showSeparator: true,
+    preventKeyboardScroll: false,
+  },
+  decorators: [
+    (Story) => (
+      <ThemeProvider theme={terminalTheme}>
+        <div style={{ height: '600px', width: '100%' }}>
+          <div style={{
+            padding: '1rem',
+            background: '#fee2e2',
+            borderBottom: '2px solid #ef4444',
+            fontSize: '0.875rem',
+            fontWeight: 'bold',
+          }}>
+            ⚠️ preventKeyboardScroll is DISABLED - Space bar will scroll the carousel (default behavior)
+          </div>
+          <div style={{ height: 'calc(100% - 50px)' }}>
+            <Story />
+          </div>
+        </div>
+      </ThemeProvider>
+    ),
+  ],
+};

@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { ReactNode, useRef, useImperativeHandle, forwardRef, useEffect } from 'react';
 import { Theme } from '@a24z/industry-theme';
 import { mapThemeToPanelVars } from '../utils/themeMapping';
 import './SnapCarousel.css';
@@ -34,6 +34,9 @@ export interface SnapCarouselProps {
 
   /** Callback when a panel comes into view */
   onPanelChange?: (index: number) => void;
+
+  /** Prevent keyboard keys (space, arrows, page up/down) from scrolling the carousel. Useful when panels contain interactive input components like terminals or text editors. (default: true) */
+  preventKeyboardScroll?: boolean;
 }
 
 /**
@@ -53,6 +56,7 @@ export const SnapCarousel = forwardRef<SnapCarouselRef, SnapCarouselProps>(({
   idealPanelWidth = 0.333, // 1/3 of viewport
   showSeparator = false,
   onPanelChange,
+  preventKeyboardScroll = true,
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -134,6 +138,28 @@ export const SnapCarousel = forwardRef<SnapCarouselRef, SnapCarouselProps>(({
 
     onPanelChange(closestIndex);
   };
+
+  // Prevent keyboard-triggered scrolling when enabled
+  useEffect(() => {
+    if (!preventKeyboardScroll || !containerRef.current) return;
+
+    const container = containerRef.current;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent keys that trigger browser scrolling
+      const scrollKeys = [' ', 'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown'];
+
+      if (scrollKeys.includes(e.key)) {
+        e.preventDefault();
+      }
+    };
+
+    container.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      container.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [preventKeyboardScroll]);
 
   // Calculate panel count for responsive sizing
   const panelCount = panels.length;
