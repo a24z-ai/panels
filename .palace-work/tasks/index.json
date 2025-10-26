@@ -1,0 +1,130 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": 1761439488800,
+  "tasks": {
+    "task-1759969133972-0wnvx1q5s": {
+      "id": "task-1759969133972-0wnvx1q5s",
+      "status": "pending",
+      "priority": "normal",
+      "directoryPath": "",
+      "senderId": "electron-app",
+      "tags": [
+        "enhancement",
+        "api-improvement",
+        "layout"
+      ],
+      "receivedAt": 1759969133972,
+      "updatedAt": 1759969133972,
+      "filePath": "active/task-1759969133972-0wnvx1q5s.task.md"
+    },
+    "task-1760282394042-4wbu6w8xh": {
+      "id": "task-1760282394042-4wbu6w8xh",
+      "status": "pending",
+      "priority": "normal",
+      "directoryPath": "",
+      "senderId": "electron-app",
+      "tags": [
+        "enhancement",
+        "controlled-component",
+        "tabs",
+        "programmatic-control",
+        "api-improvement"
+      ],
+      "receivedAt": 1760282394042,
+      "updatedAt": 1760282394042,
+      "filePath": "active/task-1760282394042-4wbu6w8xh.task.md"
+    },
+    "task-1760319913729-d1l6miv6r": {
+      "id": "task-1760319913729-d1l6miv6r",
+      "status": "completed",
+      "priority": "normal",
+      "directoryPath": "",
+      "senderId": "external",
+      "tags": [
+        "ui",
+        "styling",
+        "SnapCarousel"
+      ],
+      "receivedAt": 1760319913729,
+      "updatedAt": 1761244974460,
+      "completedAt": 1761244974460,
+      "filePath": "history/task-1760319913729-d1l6miv6r.hist.md"
+    },
+    "task-1760332093498-fyfmo6rx2": {
+      "id": "task-1760332093498-fyfmo6rx2",
+      "status": "pending",
+      "priority": "normal",
+      "directoryPath": "",
+      "senderId": "electron-app",
+      "tags": [
+        "enhancement",
+        "ui",
+        "panel-configurator"
+      ],
+      "receivedAt": 1760332093498,
+      "updatedAt": 1760332093498,
+      "filePath": "active/task-1760332093498-fyfmo6rx2.task.md"
+    },
+    "task-1761234581627-ydznayemv": {
+      "id": "task-1761234581627-ydznayemv",
+      "status": "completed",
+      "priority": "high",
+      "directoryPath": "",
+      "senderId": "external",
+      "tags": [
+        "bug",
+        "keyboard",
+        "ux",
+        "carousel"
+      ],
+      "receivedAt": 1761234581627,
+      "updatedAt": 1761244956079,
+      "completedAt": 1761244956079,
+      "filePath": "history/task-1761234581627-ydznayemv.hist.md"
+    },
+    "task-1761432000028-tu8mselcw": {
+      "id": "task-1761432000028-tu8mselcw",
+      "status": "completed",
+      "priority": "high",
+      "directoryPath": "",
+      "senderId": "electron-app",
+      "tags": [
+        "bug",
+        "keyboard-input",
+        "accessibility"
+      ],
+      "receivedAt": 1761432000028,
+      "updatedAt": 1761439488799,
+      "completedAt": 1761439488799,
+      "filePath": "history/task-1761432000028-tu8mselcw.hist.md"
+    }
+  },
+  "byStatus": {
+    "pending": [
+      "task-1759969133972-0wnvx1q5s",
+      "task-1760282394042-4wbu6w8xh",
+      "task-1760332093498-fyfmo6rx2"
+    ],
+    "acknowledged": [],
+    "in_progress": [],
+    "completed": [
+      "task-1761234581627-ydznayemv",
+      "task-1760319913729-d1l6miv6r",
+      "task-1761432000028-tu8mselcw"
+    ],
+    "failed": []
+  },
+  "bySender": {
+    "electron-app": [
+      "task-1759969133972-0wnvx1q5s",
+      "task-1760282394042-4wbu6w8xh",
+      "task-1760332093498-fyfmo6rx2",
+      "task-1761432000028-tu8mselcw"
+    ],
+    "external": [
+      "task-1760319913729-d1l6miv6r",
+      "task-1761234581627-ydznayemv"
+    ]
+  },
+  "byADE": {}
+}
