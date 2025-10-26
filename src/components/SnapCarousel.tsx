@@ -146,6 +146,20 @@ export const SnapCarousel = forwardRef<SnapCarouselRef, SnapCarouselProps>(({
     const container = containerRef.current;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't prevent keyboard events if they're targeting interactive elements
+      const target = e.target as HTMLElement;
+      const isInteractive =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable ||
+        target.closest('.xterm') !== null || // Terminal elements
+        target.closest('[contenteditable="true"]') !== null;
+
+      if (isInteractive) {
+        return; // Let the event through to the interactive element
+      }
+
       // Prevent keys that trigger browser scrolling
       const scrollKeys = [' ', 'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown'];
 
